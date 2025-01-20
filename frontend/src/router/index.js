@@ -2,7 +2,7 @@ import { createRouter, createWebHashHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
 import DashboardView from '../views/DashboardView.vue';
 import LoginView from '../views/LoginView.vue';
-import RegisterView from '../views/RegisterView.vue';
+import UserManagementView from '../views/UserManagementView.vue';
 import LogoutView from '../views/LogoutView.vue';
 import RefreshView from '../views/RefreshView.vue';
 import ActivityView from '../views/ActivityView.vue';
@@ -15,11 +15,6 @@ const routes = [
     component: HomeView,
   },
   {
-    path: '/register',
-    name: 'Register',
-    component: RegisterView,
-  },
-  {
     path: '/login',
     name: 'Login',
     component: LoginView,
@@ -28,6 +23,12 @@ const routes = [
     path: '/dashboard',
     name: 'Dashboard',
     component: DashboardView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/user_manage',
+    name: 'UserManage',
+    component: UserManagementView,
     meta: { requiresAuth: true },
   },
   {
@@ -62,6 +63,12 @@ router.beforeEach((to, from, next) => {
     }
     next('/login');
   } else {
+    if (
+      to.path === '/user_manage' &&
+      auth.super_approvement_permission !== true
+    ) {
+      next('/dashboard');
+    }
     next();
   }
 });
