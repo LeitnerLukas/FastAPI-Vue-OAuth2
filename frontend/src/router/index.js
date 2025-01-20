@@ -1,48 +1,47 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import ProfileView from '../views/ProfileView.vue'
-import LoginView from '../views/LoginView.vue'
-import RegisterView from '../views/RegisterView.vue'
-import LogoutView from '../views/LogoutView.vue'
-import RefreshView from '../views/RefreshView.vue'
-import { useAuthStore } from '../store/auth'
-import DashboardView from '../views/DashboardView.vue'
+import { createRouter, createWebHashHistory } from 'vue-router';
+import HomeView from '../views/HomeView.vue';
+import DashboardView from '../views/DashboardView.vue';
+import LoginView from '../views/LoginView.vue';
+import RegisterView from '../views/RegisterView.vue';
+import LogoutView from '../views/LogoutView.vue';
+import RefreshView from '../views/RefreshView.vue';
+import { useAuthStore } from '../store/auth';
 
 const routes = [
   {
-    path: "/",
-    name: "Home",
+    path: '/',
+    name: 'Home',
     component: HomeView,
   },
   {
-    path: "/register",
-    name: "Register",
+    path: '/register',
+    name: 'Register',
     component: RegisterView,
   },
   {
-    path: "/login",
-    name: "Login",
+    path: '/login',
+    name: 'Login',
     component: LoginView,
   },
   {
-    path: "/profile",
-    name: "Profile",
+    path: '/profile',
+    name: 'Profile',
     component: ProfileView,
     meta: { requiresAuth: true },
   },
   {
-    path: "/dashboard",
-    name: "Dashboard",
+    path: '/dashboard',
+    name: 'Dashboard',
     component: DashboardView,
   },
   {
-    path: "/logout",
-    name: "Logout",
+    path: '/logout',
+    name: 'Logout',
     component: LogoutView,
   },
   {
-    path: "/refresh",
-    name: "Refresh",
+    path: '/refresh',
+    name: 'Refresh',
     component: RefreshView,
   },
 ];
