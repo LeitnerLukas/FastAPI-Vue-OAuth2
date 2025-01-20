@@ -21,9 +21,6 @@
                 >Home</router-link
               >
             </li>
-            <li class="nav-item" v-if="auth.isAuthenticated">
-              <router-link class="nav-link" to="/logout">Logout</router-link>
-            </li>
             <li class="nav-item" v-if="!auth.isAuthenticated">
               <router-link class="nav-link" to="/login">Login</router-link>
             </li>
@@ -32,10 +29,13 @@
                 >Dashboard</router-link
               >
             </li>
-            <li class="nav-item" v-if="!auth.isAuthenticated">
-              <router-link class="nav-link" to="/register"
-                >Register</router-link
+            <li class="nav-item" v-if="auth.isAuthenticated && auth.super_approvement_permission === true">
+              <router-link class="nav-link" to="/user_manage"
+                >Manage Users</router-link
               >
+            </li>
+            <li class="nav-item" v-if="auth.isAuthenticated">
+              <router-link class="nav-link" to="/logout">Logout</router-link>
             </li>
           </ul>
         </div>
