@@ -48,22 +48,21 @@ const routes = [
 ];
 
 const router = createRouter({
-    history: createWebHashHistory(),
-    routes, // short for `routes: routes`
-})
+  history: createWebHashHistory(),
+  routes, // short for `routes: routes`
+});
 
-router.beforeEach((to, from , next) => {
-    const auth = useAuthStore();
-    if (to.matched.some((record) => record.meta.requiresAuth)) {
-        if (auth.isAuthenticated) {
-            next();
-            return;
-        }
-        next("/login");
-    } else {
-        next();
+router.beforeEach((to, from, next) => {
+  const auth = useAuthStore();
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    if (auth.isAuthenticated) {
+      next();
+      return;
     }
-
-})
+    next('/login');
+  } else {
+    next();
+  }
+});
 
 export default router;
