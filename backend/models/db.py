@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Column, String, DATE, DateTime, Boolean, Integer, Table, ForeignKey
+from sqlalchemy import Column, String, DateTime, Boolean, Integer, Table, ForeignKey
 from sqlalchemy.orm import relationship
 from crud.dependencies import AcceptState
 

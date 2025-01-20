@@ -5,18 +5,12 @@ from pydantic import BaseModel
 # User Schema
 
 
-class Base(BaseModel):
+class DB(BaseModel):
     username: str
-    birthday: date
+    name: str
+    roles: list[str]
+    approvement_permission: bool
+    super_approvement_permission: bool
+    request_permission: bool
+    change_permission: bool
 
-
-class Register(Base):
-    password: str
-
-
-class Password(BaseModel):
-    password: str
-
-
-class Birthday(BaseModel):
-    birthday: date
