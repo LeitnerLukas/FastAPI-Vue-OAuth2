@@ -8,6 +8,7 @@ import router from '../router';
 export const useAuthStore = defineStore('auth', () => {
     const access_token = ref(null);
     const expires_in = ref(null);
+    const user_type = ref(null);
 
     const loadingStore = useLoadingStore();
     const dialogStore = useDialogStore();
@@ -15,10 +16,12 @@ export const useAuthStore = defineStore('auth', () => {
     const isAuthenticated = computed(() => access_token.value && expires_in.value && expires_in.value > Date.now());
     const get_access_token = computed(() => access_token.value);
     const get_expires_in = computed(() => expires_in.value);
+    const get_user_type = computed(() => user_type.value);
 
     async function login(form) {
         access_token.value = null;
         expires_in.value = null;
+        user_type.value = null;
 
         loadingStore.setLoading();
 
@@ -26,6 +29,7 @@ export const useAuthStore = defineStore('auth', () => {
         .then(res => {
             access_token.value = res.data.access_token;
             expires_in.value = res.data.expires_in;
+            user_type.value = res.data.user_type;
 
             dialogStore.setSuccess({
                 title: 'Login Success',
@@ -41,6 +45,7 @@ export const useAuthStore = defineStore('auth', () => {
             });
             access_token.value = null;
             expires_in.value = null;
+            user_type.value = null;
         })
         .finally( () => {
             loadingStore.clearLoading();
@@ -50,6 +55,7 @@ export const useAuthStore = defineStore('auth', () => {
                 console.log(isAuthenticated.value);
                 console.log(access_token.value);
                 console.log(expires_in.value);
+                console.log(user_type.value);
                 console.log(Date.now());    
 
                 if (isAuthenticated.value){
@@ -67,6 +73,7 @@ export const useAuthStore = defineStore('auth', () => {
         .then(res => {
             access_token.value = null;
             expires_in.value = null;
+            user_type.value = null;
 
             dialogStore.setSuccess({
                 title: 'Logout Success',
@@ -88,6 +95,7 @@ export const useAuthStore = defineStore('auth', () => {
         .then(res => {
             access_token.value = res.data.access_token;
             expires_in.value = res.data.expires_in;
+            user_type.value = res.data.user_type;
 
             dialogStore.setSuccess({
                 title: 'Refresh Success',
@@ -99,6 +107,7 @@ export const useAuthStore = defineStore('auth', () => {
             console.log(err);
             access_token.value = null;
             expires_in.value = null;
+            user_type.value = null;
 
             dialogStore.setError({
                 title: 'Refresh Failed',
@@ -131,6 +140,7 @@ export const useAuthStore = defineStore('auth', () => {
         .then(res => {
             access_token.value = res.data.access_token;
             expires_in.value = res.data.expires_in;
+            user_type.value = res.data.user_type;
         })
         .catch(err => {
             console.log(err);
@@ -156,6 +166,7 @@ export const useAuthStore = defineStore('auth', () => {
         access_token,
         get_access_token,
         get_expires_in,
+        get_user_type,
         isAuthenticated,
         login,
         logout,
