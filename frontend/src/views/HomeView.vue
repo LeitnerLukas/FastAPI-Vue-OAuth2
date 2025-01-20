@@ -5,7 +5,7 @@
       <div class="container">
         <h1 class="display-4">Streamline Your Approval Workflow</h1>
         <p class="lead">Approval Sense helps teams collaborate and approve projects effortlessly.</p>
-        <button class="btn btn-primary btn-lg mt-3">Get Started</button>
+        <button class="btn btn-primary btn-lg mt-3"><router-link class="text-white" to="/login">Get Started</router-link></button>
       </div>
     </section>
 
@@ -25,16 +25,16 @@
           <div class="col-md-4">
             <div class="card feature-card p-3">
               <div class="card-body">
-                <h5 class="card-title">Real-Time Notifications</h5>
-                <p class="card-text">Stay informed about approval updates as they happen.</p>
+                <h5 class="card-title">User Management</h5>
+                <p class="card-text">Manage your students with our professional User Dashboard.</p>
               </div>
             </div>
           </div>
           <div class="col-md-4">
             <div class="card feature-card p-3">
               <div class="card-body">
-                <h5 class="card-title">Analytics Dashboard</h5>
-                <p class="card-text">Gain insights into your workflow with detailed analytics.</p>
+                <h5 class="card-title">Advanced Approval Management</h5>
+                <p class="card-text">Manage your approval Flow easier than ever.</p>
               </div>
             </div>
           </div>
@@ -73,7 +73,7 @@
     <section id="contact" class="py-5">
       <div class="container text-center">
         <h2 class="mb-4">Ready to Simplify Approvals?</h2>
-        <button class="btn btn-primary btn-lg">Sign Up Now</button>
+        <button class="btn btn-primary btn-lg"><router-link to="/login" class="text-white">Sign Up Now</router-link></button>
       </div>
     </section>
     
