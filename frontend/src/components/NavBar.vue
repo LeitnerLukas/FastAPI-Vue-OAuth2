@@ -32,7 +32,7 @@
                 >Dashboard</router-link
               >
             </li>
-            <li class="nav-item">
+            <li class="nav-item" v-if="!auth.isAuthenticated">
               <router-link class="nav-link" to="/register"
                 >Register</router-link
               >

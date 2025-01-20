@@ -9,33 +9,34 @@ import { useAuthStore } from '../store/auth';
 
 const routes = [
   {
-    path: '/',
-    name: 'Home',
+    path: "/",
+    name: "Home",
     component: HomeView,
   },
   {
-    path: '/register',
-    name: 'Register',
+    path: "/register",
+    name: "Register",
     component: RegisterView,
   },
   {
-    path: '/login',
-    name: 'Login',
+    path: "/login",
+    name: "Login",
     component: LoginView,
   },
   {
-    path: '/dashboard',
-    name: 'Dashboard',
+    path: "/dashboard",
+    name: "Dashboard",
     component: DashboardView,
+    meta: { requiresAuth: true },
   },
   {
-    path: '/logout',
-    name: 'Logout',
+    path: "/logout",
+    name: "Logout",
     component: LogoutView,
   },
   {
-    path: '/refresh',
-    name: 'Refresh',
+    path: "/refresh",
+    name: "Refresh",
     component: RefreshView,
   },
 ];
