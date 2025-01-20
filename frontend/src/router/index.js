@@ -6,40 +6,46 @@ import RegisterView from '../views/RegisterView.vue'
 import LogoutView from '../views/LogoutView.vue'
 import RefreshView from '../views/RefreshView.vue'
 import { useAuthStore } from '../store/auth'
+import DashboardView from '../views/DashboardView.vue'
 
 const routes = [
-    {
-        path: '/',
-        name: 'Home',
-        component: HomeView,
-    },
-    {
-        path: '/register',
-        name: 'Register',
-        component: RegisterView,
-    },
-    {
-        path: '/login',
-        name: 'Login',
-        component: LoginView,
-    },
-    {
-        path: '/profile',
-        name: 'Profile',
-        component: ProfileView,
-        meta: { requiresAuth: true },
-    },
-    {
-        path: '/logout',
-        name: 'Logout',
-        component: LogoutView,
-    },
-    {
-        path: '/refresh',
-        name: 'Refresh',
-        component: RefreshView,
-    },
-]
+  {
+    path: "/",
+    name: "Home",
+    component: HomeView,
+  },
+  {
+    path: "/register",
+    name: "Register",
+    component: RegisterView,
+  },
+  {
+    path: "/login",
+    name: "Login",
+    component: LoginView,
+  },
+  {
+    path: "/profile",
+    name: "Profile",
+    component: ProfileView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/dashboard",
+    name: "Dashboard",
+    component: DashboardView,
+  },
+  {
+    path: "/logout",
+    name: "Logout",
+    component: LogoutView,
+  },
+  {
+    path: "/refresh",
+    name: "Refresh",
+    component: RefreshView,
+  },
+];
 
 const router = createRouter({
     history: createWebHashHistory(),
