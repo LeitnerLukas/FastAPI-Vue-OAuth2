@@ -1,5 +1,6 @@
 <template>
   <div class="container w-100 mt-5">
+    <h5>Users:</h5>
     <table class="table">
       <thead>
         <tr>
@@ -8,6 +9,7 @@
           <th scope="col">Name</th>
           <th scope="col">Role</th>
           <th scope="col">Change Role</th>
+          <th scope="col">Remove</th>
         </tr>
       </thead>
       <tbody>
@@ -23,6 +25,29 @@
               </option>
             </select>
           </td>
+          <td><button class="btn btn-danger">Remove</button></td>
+        </tr>
+      </tbody>
+    </table>
+    <h5>Create Class:</h5>
+    <h5>Classes:</h5>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">id</th>
+          <th scope="col">Girls</th>
+          <th scope="col">Boys</th>
+          <th scope="col">Remove</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(item, idx) in classList" :key="idx">
+          <th scope="row">{{ idx + 1 }}</th>
+          <td>{{ item.classId }}</td>
+          <td>{{ item.girls }}</td>
+          <td>{{ item.boys }}</td>
+          <td><button class="btn btn-danger">Remove</button></td>
         </tr>
       </tbody>
     </table>
@@ -53,6 +78,19 @@ const userList = [
     role: {
       name: "Principal",
     },
+  },
+];
+
+const classList = [
+  {
+    classId: "4ahit",
+    girls: 10,
+    boys: 20,
+  },
+  {
+    classId: "5ahit",
+    girls: 10,
+    boys: 20,
   },
 ];
 </script>
