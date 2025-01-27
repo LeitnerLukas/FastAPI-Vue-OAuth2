@@ -15,7 +15,7 @@ async def get_users(db: UserCRUD = Depends(get_user_crud)):
 
 
 @router.post("")
-async def register(
+async def login(
     new_user: user_schema.Register, db: UserCRUD = Depends(get_user_crud)
 ):
     db_user = await db.get_user_by_username(username=new_user.username)
