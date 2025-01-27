@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from sqlalchemy import Column, String, DateTime, Boolean, Integer, Table, ForeignKey
+from sqlalchemy import Column, String, DateTime, Boolean, Integer, Table, ForeignKey, Enum
 from sqlalchemy.orm import relationship
-from crud.dependencies import AcceptState
+from crud.types import AcceptState
 
 from database.config import Base
 
@@ -35,17 +35,15 @@ class UserModels(Base):
     __tablename__ = "users"
     username = Column(String, unique=True, primary_key=True)
     name = Column(String)
-    roleId = Column(String, default="teacher", nullable=False)
     create_time = Column(DateTime, default=datetime.now())
     last_login = Column(DateTime, default=datetime.now())
 
     roles = relationship("Roles", secondary=user_role, back_populates="users")
     activities = relationship("Activities", secondary=user_activity, back_populates="users")
 
-    def __init__(self, username: str, name: str, roleId: int):
+    def __init__(self, username: str, name: str):
         self.username = username
         self.name = name
-        self.roleId = roleId
 
 
     def __repr__(self) -> str:
@@ -86,7 +84,7 @@ class Activities(Base):
     end_time = Column(DateTime)
 
     sga_approved = Column(Boolean, default=False)
-    state = Column(AcceptState, default=AcceptState.REQUESTED)
+    state = Column(Enum(AcceptState), default=AcceptState.REQUESTED)
 
     create_time = Column(DateTime, default=datetime.now())
     last_update = Column(DateTime, default=datetime.now())
@@ -111,7 +109,7 @@ class Activities(Base):
 
 class Classes(Base):
     __tablename__ = "classes"
-    class_id = Column(Integer, primary_key=True, autoincrement=True)
+    class_id = Column(String, primary_key=True)
     girl_count = Column(Integer)
     boy_count = Column(Integer)
 
@@ -128,7 +126,7 @@ class Classes(Base):
 class Notes(Base):
     __tablename__ = "notes"
     note_id = Column(Integer, primary_key=True, autoincrement=True)
-    event_state = Column(AcceptState)
+    event_state = Column(Enum(AcceptState))
     note = Column(String)
     activity_id = Column(Integer, ForeignKey("activities.activity_id"))
     create_time = Column(DateTime, default=datetime.now())
@@ -155,4 +153,3 @@ class ParentInfos(Base):
         self.text = text
         self.activity_id = activity_id
     
-
