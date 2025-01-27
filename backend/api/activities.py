@@ -18,10 +18,10 @@ async def get_activity_by_id(activityId: int, db: ActivityCRUD):
 async def create_activity(new_activity: activities_schema.Create, db: ActivityCRUD):
     return await db.create_activity(new_activity)
 
-@router.put("", deprecated=True)
+@router.put("")
 async def update_activity(activityId: int, activity: activities_schema.Update, db: ActivityCRUD):
     return await db.update_activity(activityId, activity)
 
-@router.delete("", deprecated=True)
+@router.delete("")
 async def delete_activity(activityId: int, db: ActivityCRUD):
     return await db.delete_activity(activityId)
