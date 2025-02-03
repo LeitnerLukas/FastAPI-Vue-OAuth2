@@ -4,6 +4,7 @@ import DashboardView from '../views/DashboardView.vue';
 import LoginView from '../views/LoginView.vue';
 import UserManagementView from '../views/UserManagementView.vue';
 import LogoutView from '../views/LogoutView.vue';
+import NewActivity from '../views/NewActivity.vue';
 import RefreshView from '../views/RefreshView.vue';
 import ActivityView from '../views/ActivityView.vue';
 import { useAuthStore } from '../store/auth';
@@ -36,6 +37,12 @@ const routes = [
     name: 'ActivityView',
     component: ActivityView, // Use ActivityView for the /activity/:id route
     props: true, // Pass the route params as props
+  },
+  {
+    path: '/activity/new',
+    name: 'NewActivity',
+    component: NewActivity, // Use NewActivityView for the /activity/new route
+    meta: { requiresAuth: true },
   },
   {
     path: '/logout',

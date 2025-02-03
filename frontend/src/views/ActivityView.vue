@@ -56,13 +56,24 @@
           >
         </div>
 
-        <button
-          @click="saveNote"
-          class="btn btn-primary mt-3"
-          :disabled="isTeacher"
-        >
-          Save Note
-        </button>
+        <div class="d-flex justify-content-between mt-3">
+          <button
+            v-if="activity"
+            @click="saveNote"
+            class="btn btn-primary"
+            :disabled="isTeacher || !note.trim()"
+          >
+            Save Note
+          </button>
+          <button
+            v-if="activity"
+            @click="approve"
+            class="btn btn-primary"
+            :disabled="isTeacher || activity.approved"
+          >
+            Approve
+          </button>
+        </div>
       </div>
     </div>
     <div v-else class="alert alert-info" role="alert">
@@ -96,7 +107,6 @@ const formatDate = (date) => {
 };
 
 const fetchActivity = () => {
-  // Mock data for demonstration
   const activities = [
     {
       activityId: 1,
@@ -123,15 +133,28 @@ const fetchActivity = () => {
       state: 'Pending',
     },
   ];
-  activity.value = activities.find(
+  const foundActivity = activities.find(
     (a) => a.activityId === parseInt(activityId.value)
   );
+  if (foundActivity) {
+    activity.value = foundActivity;
+  } else {
+    console.error('Activity not found for ID:', activityId.value);
+  }
 };
 
 const saveNote = () => {
-  // Here you would typically save the note to your backend
-  console.log('Saving note:', note.value);
-  // Add your API call or state management logic here
+  if (!note.value.trim()) {
+    alert('Note cannot be empty.');
+    return;
+  }
+  console.log('Saving note:', note.value, activityId.value);
+  // Add backend API call here
+};
+
+const approve = () => {
+  console.log('Approving activity:', activityId.value);
+  // Add backend API call here
 };
 
 onMounted(() => {

@@ -1,7 +1,12 @@
 <!-- src/views/DashboardView.vue -->
 <template>
   <div class="dashboard">
-    <h1>Dashboard</h1>
+    <div class="header">
+      <h1>Dashboard</h1>
+      <router-link :to="'/activity/new'" class="btn btn-primary">
+        New Activity
+      </router-link>
+    </div>
     <div class="entity-list">
       <EntityDisplay
         v-for="(entity, index) in entities"
