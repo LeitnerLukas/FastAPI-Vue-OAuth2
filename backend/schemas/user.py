@@ -1,22 +1,16 @@
-from datetime import date
+from datetime import datetime
 
 from pydantic import BaseModel
 
 # User Schema
 
 
-class Base(BaseModel):
+class DB(BaseModel):
     username: str
-    birthday: date
+    name: str
+    create_time: datetime
+    last_login: datetime
 
-
-class Register(Base):
-    password: str
-
-
-class Password(BaseModel):
-    password: str
-
-
-class Birthday(BaseModel):
-    birthday: date
+class Create(BaseModel):
+    username: str
+    name: str
