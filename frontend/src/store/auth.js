@@ -4,7 +4,6 @@ import {
   apiLogin,
   apiRefresh,
   apiLogout,
-  apiLoginMicrosoft,
 } from "../api/auth";
 import { useLoadingStore } from "./loading";
 import { useDialogStore } from "./dialog";
@@ -12,7 +11,6 @@ import router from "../router";
 
 export const useAuthStore = defineStore("auth", () => {
   const access_token = ref(null);
-  const expires_in = ref(null);
   const approvement_permission = ref(null);
   const super_approvement_permission = ref(null);
   const request_permission = ref(null);
@@ -23,10 +21,9 @@ export const useAuthStore = defineStore("auth", () => {
 
   const isAuthenticated = computed(
     () =>
-      access_token.value && expires_in.value && expires_in.value > Date.now()
+      access_token.value
   );
   const get_access_token = computed(() => access_token.value);
-  const get_expires_in = computed(() => expires_in.value);
   const get_approvement_permission = computed(
     () => approvement_permission.value
   );
@@ -38,7 +35,6 @@ export const useAuthStore = defineStore("auth", () => {
 
   async function login(form) {
     access_token.value = null;
-    expires_in.value = null;
     approvement_permission.value = null;
     super_approvement_permission.value = null;
     request_permission.value = null;
@@ -49,7 +45,6 @@ export const useAuthStore = defineStore("auth", () => {
     apiLogin(form)
       .then((res) => {
         access_token.value = res.data.access_token;
-        expires_in.value = res.data.expires_in;
         approvement_permission.value = res.data.role.approvement_permission;
         super_approvement_permission.value =
           res.data.role.super_approvement_permission;
@@ -69,7 +64,6 @@ export const useAuthStore = defineStore("auth", () => {
           secondLine: "This dialog will close in 1 seconds",
         });
         access_token.value = null;
-        expires_in.value = null;
         approvement_permission.value = null;
         super_approvement_permission.value = null;
         request_permission.value = null;
@@ -82,65 +76,6 @@ export const useAuthStore = defineStore("auth", () => {
 
           console.log(isAuthenticated.value);
           console.log(access_token.value);
-          console.log(expires_in.value);
-          console.log(Date.now());
-
-          if (isAuthenticated.value) {
-            router.push("/dashboard");
-            console.log("pushed to profile");
-          }
-        }, 1000);
-      });
-  }
-
-  async function loginMicrosoft(form) {
-    access_token.value = null;
-    expires_in.value = null;
-    approvement_permission.value = null;
-    super_approvement_permission.value = null;
-    request_permission.value = null;
-    change_permission.value = null;
-
-    loadingStore.setLoading();
-
-    apiLoginMicrosoft()
-      .then((res) => {
-        access_token.value = res.data.access_token;
-        expires_in.value = res.data.expires_in;
-        approvement_permission.value = res.data.role.approvement_permission;
-        super_approvement_permission.value =
-          res.data.role.super_approvement_permission;
-        request_permission.value = res.data.role.request_permission;
-        change_permission.value = res.data.role.change_permission;
-
-        dialogStore.setSuccess({
-          title: "Login Success",
-          firstLine: "You can login now",
-          secondLine: "This dialog will close in 1 seconds",
-        });
-      })
-      .catch((err) => {
-        dialogStore.setError({
-          title: "Login Failed",
-          firstLine: "Please check your input",
-          secondLine: "This dialog will close in 1 seconds",
-        });
-        access_token.value = null;
-        expires_in.value = null;
-        approvement_permission.value = null;
-        super_approvement_permission.value = null;
-        request_permission.value = null;
-        change_permission.value = null;
-      })
-      .finally(() => {
-        loadingStore.clearLoading();
-        setTimeout(() => {
-          dialogStore.reset();
-
-          console.log(isAuthenticated.value);
-          console.log(access_token.value);
-          console.log(expires_in.value);
-          console.log(Date.now());
 
           if (isAuthenticated.value) {
             router.push("/dashboard");
@@ -153,7 +88,6 @@ export const useAuthStore = defineStore("auth", () => {
   function logout() {
     apiLogout().then((res) => {
       access_token.value = null;
-      expires_in.value = null;
       approvement_permission.value = null;
       super_approvement_permission.value = null;
       request_permission.value = null;
@@ -178,7 +112,6 @@ export const useAuthStore = defineStore("auth", () => {
     apiRefresh()
       .then((res) => {
         access_token.value = res.data.access_token;
-        expires_in.value = res.data.expires_in;
         approvement_permission.value = res.data.role.approvement_permission;
         super_approvement_permission.value =
           res.data.role.super_approvement_permission;
@@ -194,7 +127,6 @@ export const useAuthStore = defineStore("auth", () => {
       .catch((err) => {
         console.log(err);
         access_token.value = null;
-        expires_in.value = null;
         approvement_permission.value = null;
         super_approvement_permission.value = null;
         request_permission.value = null;
@@ -228,7 +160,6 @@ export const useAuthStore = defineStore("auth", () => {
     apiRefresh()
       .then((res) => {
         access_token.value = res.data.access_token;
-        expires_in.value = res.data.expires_in;
         approvement_permission.value = null;
         super_approvement_permission.value = null;
         request_permission.value = null;
@@ -237,7 +168,6 @@ export const useAuthStore = defineStore("auth", () => {
       .catch((err) => {
         console.log(err);
         access_token.value = null;
-        expires_in.value = null;
       })
       .finally(() => {
         if (isAuthenticated.value) {
@@ -254,20 +184,17 @@ export const useAuthStore = defineStore("auth", () => {
 
   return {
     get_access_token,
-    get_expires_in,
     get_approvement_permission,
     get_super_approvement_permission,
     get_request_permission,
     get_change_permission,
     access_token,
     isAuthenticated,
-    expires_in,
     approvement_permission,
     super_approvement_permission: true,
     request_permission,
     change_permission,
     login,
-    loginMicrosoft,
     logout,
     refresh,
     refreshForLogin,

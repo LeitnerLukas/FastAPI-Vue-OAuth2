@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 import uvicorn
 
 if __name__ == "__main__":
+    print("Running the server...")
+    print("Password", str(os.getenv("SSL_KEYFILE_PASSWORD")))
     parser = argparse.ArgumentParser(description="Run the server in different modes.")
 
     app_mode = parser.add_argument_group(
@@ -28,9 +30,15 @@ if __name__ == "__main__":
         # check out setting/config.py for `ENV_PREFIX` use case
         load_dotenv(".env")
 
+    keyfile = "./certs/key.pem"
+    certfile = "./certs/cert.pem"
+
     uvicorn.run(
         "app:app",
         host="0.0.0.0",
         port=int(os.getenv("PORT")),
         reload=bool(os.getenv("RELOAD")),
+        ssl_keyfile=keyfile,
+        ssl_certfile=certfile,
+        ssl_keyfile_password=str(os.getenv("SSL_KEYFILE_PASSWORD")),
     )

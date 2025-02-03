@@ -8,6 +8,7 @@ import NewActivity from '../views/NewActivity.vue';
 import RefreshView from '../views/RefreshView.vue';
 import ActivityView from '../views/ActivityView.vue';
 import { useAuthStore } from '../store/auth';
+import RegisterView from '../views/RegisterView.vue';
 
 const routes = [
   {
@@ -19,6 +20,16 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: LoginView,
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: RegisterView,
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: RegisterView,
   },
   {
     path: '/dashboard',
