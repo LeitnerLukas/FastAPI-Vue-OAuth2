@@ -154,9 +154,11 @@ async def auth_callback(request: Request, db: UserCRUD = Depends(get_user_crud),
         user_data = requests.get("https://graph.microsoft.com/v1.0/me", headers=headers).json()
         
         preferred_username = user_data.get("userPrincipalName")  # Or use "mail" if preferred
-
-        user_create = Create(username=preferred_username, name=preferred_username)
-        db.create_user(user_create)
+        displayName = user_data.get("displayName")
+        print(f"preferred_username: {preferred_username}")
+        user_create = Create(username=preferred_username, name=displayName)
+        if not await db.get_user_by_username(preferred_username):
+            await db.create_user(user_create)
 
         access_token_project = await create_access_token(data={"sub": preferred_username})      
         return RedirectResponse(url=f"{FRONTEND_URL}/login?access_token={access_token_project}")

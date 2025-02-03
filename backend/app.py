@@ -1,13 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api import user, auth
+from api import user, auth, test
 from database.config import engine, database, Base
 
 
 app = FastAPI()
 app.include_router(auth.router)
 app.include_router(user.router, prefix="/api")
+app.include_router(test.router)
 
 
 methods = [
