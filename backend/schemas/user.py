@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime
 
 from pydantic import BaseModel
 
@@ -8,9 +8,9 @@ from pydantic import BaseModel
 class DB(BaseModel):
     username: str
     name: str
-    roles: list[str]
-    approvement_permission: bool
-    super_approvement_permission: bool
-    request_permission: bool
-    change_permission: bool
+    create_time: datetime
+    last_login: datetime
 
+class Create(BaseModel):
+    username: str
+    name: str

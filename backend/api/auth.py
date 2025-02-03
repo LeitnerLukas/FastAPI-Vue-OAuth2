@@ -3,16 +3,34 @@ from datetime import datetime, timedelta, timezone
 from jose import jwt
 from fastapi import APIRouter, Depends, HTTPException, status, Cookie, Response, Request
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.responses import RedirectResponse, JSONResponse
+import requests
 
 from auth.action import validate_user
 from auth.utils import create_access_token, create_refresh_token
 from crud.dependencies import get_user_crud
 from crud.user import UserCRUD
 from schemas.token import Token
+from schemas.user import Create
 from setting.config import get_settings
+from os import getenv
+from msal import ConfidentialClientApplication
+
+MS_TENANT_ID = str(getenv("MS_TENANT_ID"))
+MS_CLIENT_ID =str(getenv("MS_CLIENT_ID"))
+MS_CLIENT_SECRET = str(getenv("MS_CLIENT_SECRET"))
+REDIRECT_URI = str(getenv("BACKEND_URL")) + "/oauth2-redirect"
+AUTHORITY = "https://login.microsoftonline.com/" + MS_TENANT_ID
+
+print("Authority: ", AUTHORITY)
+
+app_instance = ConfidentialClientApplication(
+    MS_CLIENT_ID, authority=AUTHORITY, client_credential=MS_CLIENT_SECRET
+)
 
 settings = get_settings()
 router = APIRouter(prefix="/auth", tags=["auth"])
+SCOPES = ["User.Read"]
 
 
 @router.post("/login", response_model=Token)
@@ -21,6 +39,7 @@ async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: UserCRUD = Depends(get_user_crud),
 ):
+    return "deprecated"
     user = await validate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -60,6 +79,7 @@ async def refresh(
     response: Response,
     db: UserCRUD = Depends(get_user_crud),
 ):
+    return "deprecated"
     credentials_exception = HTTPException(
         status_code=401,
         detail="Could not validate credentials",
@@ -107,6 +127,38 @@ async def refresh(
         expires_in=expired_time,
         token_type="Bearer",
     )
+
+@router.get("/ms/login")
+async def ms_login():
+    auth_url = app_instance.get_authorization_request_url(
+        SCOPES, redirect_uri=REDIRECT_URI
+    )
+    return RedirectResponse(url=auth_url)
+
+
+@router.get("/oauth2-redirect")
+async def auth_callback(request: Request):
+    code = request.query_params.get("code")
+    
+    result = app_instance.acquire_token_by_authorization_code(
+        code, scopes=SCOPES, redirect_uri=REDIRECT_URI
+    )
+    
+    if "access_token" in result:
+        access_token = result["access_token"]
+        
+        headers = {"Authorization": f"Bearer {access_token}"}
+        user_data = requests.get("https://graph.microsoft.com/v1.0/me", headers=headers).json()
+        
+        preferred_username = user_data.get("userPrincipalName")  # Or use "mail" if preferred
+
+        user_create = Create(username=preferred_username, name=preferred_username)
+        UserCRUD.create_user(user_create)
+
+        access_token_project = create_access_token(data={"sub": preferred_username})      
+        return RedirectResponse(url=f"/login?access_token={access_token_project}")
+    
+    return JSONResponse({"error": "Authentication failed"})
 
 
 @router.post("/logout")
