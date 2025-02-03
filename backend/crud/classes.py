@@ -20,16 +20,17 @@ class ClassCRUD:
         classes = result.scalars().all()
         return classes
     
-    async def get_class_by_id(self, class_id: int):
+    async def get_class_by_id(self, class_id: str):
         stmt = select(Classes).options(
             joinedload(Classes.activities),
         ).filter_by(class_id=class_id)
         result = await self.db_session.execute(stmt)
-        classes = result.scalars().all()
+        classes = result.scalars().first()
         return classes
     
     async def create_class(self, class_: class_schema.Create) -> class_schema.Base:
         db_class = Classes(
+            class_id=class_.class_id,
             girl_count=class_.girl_count,
             boy_count=class_.boy_count,
         )
@@ -37,7 +38,7 @@ class ClassCRUD:
         await self.db_session.commit()
         return db_class
 
-    async def update_class(self, class_id: int, class_: class_schema.Update):
+    async def update_class(self, class_id: str, class_: class_schema.Update):
         stmt_classes = (
             update(Classes)
             .where(Classes.class_id == class_id)
@@ -49,6 +50,6 @@ class ClassCRUD:
         await self.db_session.execute(stmt_classes)
         await self.db_session.commit()
 
-    async def delete_class(self, class_id: int):
+    async def delete_class(self, class_id: str):
         stmt = delete(Classes).where(Classes.class_id == class_id)
         await self.db_session.execute(stmt)

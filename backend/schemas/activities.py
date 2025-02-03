@@ -11,8 +11,6 @@ class Base(BaseModel):
     transfer_cost: int
     start_time: str
     end_time: str
-    sga_approved: bool
-    state: str
     create_time: str
     last_update: str
 
@@ -24,8 +22,6 @@ class Create(BaseModel):
     transfer_cost: int
     start_time: datetime
     end_time: datetime
-    sga_approved: Optional[bool] = False
-    state: Optional[str] = "REQUESTED"
 
 class Update(BaseModel):
     location: Optional[str]
@@ -35,6 +31,4 @@ class Update(BaseModel):
     transfer_cost: Optional[int]
     start_time: Optional[datetime]
     end_time: Optional[datetime]
-    sga_approved: Optional[bool]
-    state: Optional[str]
     last_update: Optional[datetime] = datetime.now()
