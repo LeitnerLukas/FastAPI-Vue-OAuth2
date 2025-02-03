@@ -6,7 +6,7 @@ from database.config import engine, database, Base
 
 
 app = FastAPI()
-app.include_router(auth.router, prefix="/api")
+app.include_router(auth.router)
 app.include_router(user.router, prefix="/api")
 
 

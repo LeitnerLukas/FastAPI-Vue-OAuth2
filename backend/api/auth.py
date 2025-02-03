@@ -21,6 +21,7 @@ MS_CLIENT_ID =str(getenv("MS_CLIENT_ID"))
 MS_CLIENT_SECRET = str(getenv("MS_CLIENT_SECRET"))
 REDIRECT_URI = str(getenv("BACKEND_URL")) + "/oauth2-redirect"
 AUTHORITY = "https://login.microsoftonline.com/" + MS_TENANT_ID
+FRONTEND_URL = str(getenv("FRONTEND_URL"))
 
 print("Authority: ", AUTHORITY)
 
@@ -29,7 +30,7 @@ app_instance = ConfidentialClientApplication(
 )
 
 settings = get_settings()
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(tags=["auth"])
 SCOPES = ["User.Read"]
 
 
@@ -130,6 +131,7 @@ async def refresh(
 
 @router.get("/ms/login")
 async def ms_login():
+    print(REDIRECT_URI)
     auth_url = app_instance.get_authorization_request_url(
         SCOPES, redirect_uri=REDIRECT_URI
     )
@@ -137,7 +139,7 @@ async def ms_login():
 
 
 @router.get("/oauth2-redirect")
-async def auth_callback(request: Request):
+async def auth_callback(request: Request, db: UserCRUD = Depends(get_user_crud),):
     code = request.query_params.get("code")
     
     result = app_instance.acquire_token_by_authorization_code(
@@ -146,6 +148,7 @@ async def auth_callback(request: Request):
     
     if "access_token" in result:
         access_token = result["access_token"]
+        print(access_token)
         
         headers = {"Authorization": f"Bearer {access_token}"}
         user_data = requests.get("https://graph.microsoft.com/v1.0/me", headers=headers).json()
@@ -153,10 +156,10 @@ async def auth_callback(request: Request):
         preferred_username = user_data.get("userPrincipalName")  # Or use "mail" if preferred
 
         user_create = Create(username=preferred_username, name=preferred_username)
-        UserCRUD.create_user(user_create)
+        db.create_user(user_create)
 
-        access_token_project = create_access_token(data={"sub": preferred_username})      
-        return RedirectResponse(url=f"/login?access_token={access_token_project}")
+        access_token_project = await create_access_token(data={"sub": preferred_username})      
+        return RedirectResponse(url=f"{FRONTEND_URL}/login?access_token={access_token_project}")
     
     return JSONResponse({"error": "Authentication failed"})
 

@@ -91,8 +91,8 @@ class Activities(Base):
 
     users = relationship("UserModels", secondary=user_activity, back_populates="activities")
     classes = relationship("Classes", secondary=class_activity, back_populates="activities")
-    notes = relationship("Notes", back_populates="activity")
-    parent_infos = relationship("ParentInfos", back_populates="activity")
+    notes = relationship("Notes")
+    parent_infos = relationship("ParentInfos")
 
     def __init__(self, description: str, start_time: datetime, end_time: datetime, location: str, curriculum_reference: str, cost: float, transfer_cost:float):
         self.location = location
@@ -131,8 +131,6 @@ class Notes(Base):
     activity_id = Column(Integer, ForeignKey("activities.activity_id"))
     create_time = Column(DateTime, default=datetime.now())
 
-    activity = relationship("Activities", back_populates="notes")
-
     def __init__(self, event_state: AcceptState, note: str, activity_id: int):
         self.event_state = event_state
         self.note = note
@@ -146,8 +144,6 @@ class ParentInfos(Base):
     parent_info_id = Column(Integer, primary_key=True, autoincrement=True)
     activity_id = Column(Integer, ForeignKey("activities.activity_id"))
     text = Column(String)
-
-    activity = relationship("Activities", back_populates="notes")
 
     def __init__(self, text: str, activity_id: int):
         self.text = text
