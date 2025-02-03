@@ -6,6 +6,7 @@ import UserManagementView from '../views/UserManagementView.vue';
 import LogoutView from '../views/LogoutView.vue';
 import RefreshView from '../views/RefreshView.vue';
 import { useAuthStore } from '../store/auth';
+import RegisterView from '../views/RegisterView.vue';
 
 const routes = [
   {
@@ -17,6 +18,11 @@ const routes = [
     path: "/login",
     name: "Login",
     component: LoginView,
+  },
+  {
+    path: "/register",
+    name: "Register",
+    component: RegisterView,
   },
   {
     path: "/dashboard",
