@@ -1,42 +1,44 @@
 <template>
   <div class="container w-100 mt-5">
     <h5>Users:</h5>
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Email</th>
-          <th scope="col">Name</th>
-          <th scope="col">Role</th>
-          <th scope="col">Change Role</th>
-          <th scope="col">Remove</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(user, idx) in users" :key="idx">
-          <th scope="row">{{ idx + 1 }}</th>
-          <td>{{ user.email }}</td>
-          <td>{{ user.name }}</td>
-          <td>{{ user.role.name }}</td>
-          <td>
-            <select
-              id="roleSelect"
-              class="form-select"
-              @change="updateRole(user.id, $event.target.value)"
-            >
-              <option v-for="role in roles" :key="role.name" :value="role.id">
-                {{ role.name }}
-              </option>
-            </select>
-          </td>
-          <td>
-            <button class="btn btn-danger" @click="removeUser(user.id)">
-              Remove
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Email</th>
+            <th scope="col">Name</th>
+            <th scope="col">Role</th>
+            <th scope="col">Change Role</th>
+            <th scope="col">Remove</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(user, idx) in users" :key="idx">
+            <th scope="row">{{ idx + 1 }}</th>
+            <td>{{ user.email }}</td>
+            <td>{{ user.name }}</td>
+            <td>{{ user.role.name }}</td>
+            <td>
+              <select
+                id="roleSelect"
+                class="form-select"
+                @change="updateRole(user.id, $event.target.value)"
+              >
+                <option v-for="role in roles" :key="role.name" :value="role.id">
+                  {{ role.name }}
+                </option>
+              </select>
+            </td>
+            <td>
+              <button class="btn btn-danger" @click="removeUser(user.id)">
+                Remove
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     <h5 class="mt-3">Create Class:</h5>
     <form @submit.prevent="submitClass(classData)">
       <div class="mb-3">
@@ -77,30 +79,32 @@
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>
     <h5 class="mt-5 mb-2">Classes:</h5>
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">id</th>
-          <th scope="col">Girls</th>
-          <th scope="col">Boys</th>
-          <th scope="col">Remove</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(item, idx) in classes" :key="idx">
-          <th scope="row">{{ idx + 1 }}</th>
-          <td>{{ item.classId }}</td>
-          <td>{{ item.girls }}</td>
-          <td>{{ item.boys }}</td>
-          <td>
-            <button class="btn btn-danger" @click="removeClass(item.classId)">
-              Remove
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">id</th>
+            <th scope="col">Girls</th>
+            <th scope="col">Boys</th>
+            <th scope="col">Remove</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item, idx) in classes" :key="idx">
+            <th scope="row">{{ idx + 1 }}</th>
+            <td>{{ item.classId }}</td>
+            <td>{{ item.girls }}</td>
+            <td>{{ item.boys }}</td>
+            <td>
+              <button class="btn btn-danger" @click="removeClass(item.classId)">
+                Remove
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
