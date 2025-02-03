@@ -17,16 +17,18 @@ class ActivityCRUD:
             joinedload(Activities.users),
             joinedload(Activities.classes),
             joinedload(Activities.parent_infos),
+            # joinedload(Activities.notes),
         )
         result = await self.db_session.execute(stmt)
         activities = result.unique().scalars().all()
         return activities
     
-    async def get_activity_by_id(self, activity_id: int):
+    async def get_activity_by_id(self, activity_id: int) -> activity_schema.Base:
         stmt = select(Activities).options(
             joinedload(Activities.users),
             joinedload(Activities.classes),
             joinedload(Activities.parent_infos),
+            # joinedload(Activities.notes),
         ).filter_by(activity_id=activity_id)
         result = await self.db_session.execute(stmt)
         activities = result.scalars().first()
