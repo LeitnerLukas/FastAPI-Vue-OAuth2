@@ -91,17 +91,7 @@ class Activities(Base):
 
     users = relationship("UserModels", secondary=user_activity, back_populates="activities")
     classes = relationship("Classes", secondary=class_activity, back_populates="activities")
-    notes = relationship("Notes", back_populates="activity")
     parent_infos = relationship("ParentInfos", back_populates="activity")
-
-    def __init__(self, description: str, start_time: datetime, end_time: datetime, location: str, curriculum_reference: str, cost: float, transfer_cost:float):
-        self.location = location
-        self.description = description
-        self.curriculum_reference = curriculum_reference
-        self.cost = cost
-        self.transfer_cost = transfer_cost
-        self.start_time = start_time
-        self.end_time = end_time
 
     def __repr__(self) -> str:
         return f"<Activities(location={self.location}, description={self.description}, curriculum_reference={self.curriculum_reference}, cost={self.cost}, transfer_cost={self.transfer_cost}, start_time={self.start_time}, end_time={self.end_time})>"
@@ -115,31 +105,8 @@ class Classes(Base):
 
     activities = relationship("Activities", secondary=class_activity, back_populates="classes")
 
-    def __init__(self, girl_count: int, boy_count: int):
-        self.girl_count = girl_count
-        self.boy_count = boy_count
-
     def __repr__(self) -> str:
         return f"<Classes(girl_count={self.girl_count}, boy_count={self.boy_count})>"
-
-
-class Notes(Base):
-    __tablename__ = "notes"
-    note_id = Column(Integer, primary_key=True, autoincrement=True)
-    event_state = Column(Enum(AcceptState))
-    note = Column(String)
-    activity_id = Column(Integer, ForeignKey("activities.activity_id"))
-    create_time = Column(DateTime, default=datetime.now())
-
-    activity = relationship("Activities", back_populates="notes")
-
-    def __init__(self, event_state: AcceptState, note: str, activity_id: int):
-        self.event_state = event_state
-        self.note = note
-        self.activity_id = activity_id
-
-    def __repr__(self) -> str:
-        return f"<Notes(note={self.note})>" 
 
 class ParentInfos(Base):
     __tablename__ = "parent_infos"
@@ -147,7 +114,7 @@ class ParentInfos(Base):
     activity_id = Column(Integer, ForeignKey("activities.activity_id"))
     text = Column(String)
 
-    activity = relationship("Activities", back_populates="notes")
+    activity = relationship("Activities", back_populates="parent_infos")
 
     def __init__(self, text: str, activity_id: int):
         self.text = text

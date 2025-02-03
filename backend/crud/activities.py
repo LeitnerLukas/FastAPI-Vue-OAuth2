@@ -16,7 +16,6 @@ class ActivityCRUD:
         stmt = select(Activities).options(
             joinedload(Activities.users),
             joinedload(Activities.classes),
-            joinedload(Activities.notes),
             joinedload(Activities.parent_infos),
         )
         result = await self.db_session.execute(stmt)
@@ -27,11 +26,10 @@ class ActivityCRUD:
         stmt = select(Activities).options(
             joinedload(Activities.users),
             joinedload(Activities.classes),
-            joinedload(Activities.notes),
             joinedload(Activities.parent_infos),
         ).filter_by(activity_id=activity_id)
         result = await self.db_session.execute(stmt)
-        activities = result.scalars().all()
+        activities = result.scalars().first()
         return activities
     
     async def create_activity(self, activity: activity_schema.Create) -> activity_schema.Base:
@@ -43,8 +41,6 @@ class ActivityCRUD:
             transfer_cost=activity.transfer_cost,
             start_time=activity.start_time,
             end_time=activity.end_time,
-            sga_approved=activity.sga_approved,
-            state=activity.state,
         )
         self.db_session.add(db_activity)
         await self.db_session.commit()
@@ -61,8 +57,6 @@ class ActivityCRUD:
                 transfer_cost=activity.transfer_cost,
                 start_time=activity.start_time,
                 end_time=activity.end_time,
-                sga_approved=activity.sga_approved,
-                state=activity.state,
                 last_update=activity.last_update
             )
         )
