@@ -25,7 +25,7 @@ async def update_class(classId: str, class_: class_schema.Update, db: ClassCRUD 
     await db.update_class(classId, class_)
     return class_
 
-@router.delete("/classes")
+@router.delete("/classes/{classId}")
 async def delete_class(classId: str, db: ClassCRUD = Depends(get_classes_crud)):
     await db.delete_class(classId)
     return {"message": "Class deleted successfully"}

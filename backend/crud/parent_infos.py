@@ -17,7 +17,7 @@ class ParentInfosCRUD:
             joinedload(ParentInfos.activity),
         )
         result = await self.db_session.execute(stmt)
-        parent_infos = result.scalars().all()
+        parent_infos = result.unique().scalars().all()
         return parent_infos
 
     async def get_parent_info_by_id(self, parent_info_id: int):

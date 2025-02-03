@@ -17,7 +17,7 @@ class ClassCRUD:
             joinedload(Classes.activities),
         )
         result = await self.db_session.execute(stmt)
-        classes = result.scalars().all()
+        classes = result.unique().scalars().all()
         return classes
     
     async def get_class_by_id(self, class_id: str):

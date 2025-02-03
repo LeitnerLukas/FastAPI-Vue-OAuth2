@@ -24,6 +24,6 @@ async def create_parent_info(new_parent_info: parent_schema.Create, db: ParentIn
 async def update_parent_info(parentInfoId: int, parent_info: parent_schema.Update, db: ParentInfosCRUD = Depends(get_parent_infos_crud)):
     return await db.update_parent_info(parentInfoId, parent_info)
 
-@router.delete("/parent_infos")
+@router.delete("/parent_infos/{parentInfoId}")
 async def delete_parent_info(parentInfoId: int, db: ParentInfosCRUD = Depends(get_parent_infos_crud)):
     return await db.delete_parent_info(parentInfoId)

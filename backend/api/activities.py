@@ -25,7 +25,7 @@ async def update_activity(activityId: int, activity: activities_schema.Update, d
     await db.update_activity(activityId, activity)
     return activity
 
-@router.delete("/activities")
+@router.delete("/activities/{activityId}")
 async def delete_activity(activityId: int, db: ActivityCRUD = Depends(get_activities_crud)):
     await db.delete_activity(activityId)
     return {"message": "Activity deleted successfully"}

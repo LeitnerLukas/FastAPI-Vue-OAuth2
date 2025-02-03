@@ -19,7 +19,7 @@ class ActivityCRUD:
             joinedload(Activities.parent_infos),
         )
         result = await self.db_session.execute(stmt)
-        activities = result.scalars().all()
+        activities = result.unique().scalars().all()
         return activities
     
     async def get_activity_by_id(self, activity_id: int):

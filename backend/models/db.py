@@ -132,6 +132,8 @@ class ParentInfos(Base):
     activity_id = Column(Integer, ForeignKey("activities.activity_id"))
     text = Column(String)
 
+    activity = relationship("Activities", back_populates="parent_infos")
+
     def __init__(self, text: str, activity_id: int):
         self.text = text
         self.activity_id = activity_id
