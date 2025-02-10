@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from models import Activity, Note
 from database import get_db
 from schemas import NoteCreate
-from crud.dependencies import AcceptState
+from crud.types import AcceptState
 
 app = FastAPI()
 

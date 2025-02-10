@@ -1,14 +1,10 @@
 from pydantic import BaseModel
 from enum import Enum
-
-class EventState(str, Enum):
-    pending = "pending"
-    approved = "approved"
-    rejected = "rejected"
+from crud.types import AcceptState
 
 class ActivityApprovalRequest(BaseModel):
     userid: int
-    event_state: EventState  
+    event_state: AcceptState  
     note: str = None  
 
 
