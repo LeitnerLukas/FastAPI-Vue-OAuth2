@@ -29,10 +29,12 @@ const routes = [
   {
     path: '/apiregister',
     name: 'Register',
+    path: '/register',
+    name: 'Register',
     component: RegisterView,
   },
   {
-    path: '/apidashboard',
+    path: '/dashboard',
     name: 'Dashboard',
     component: DashboardView,
     meta: { requiresAuth: true },

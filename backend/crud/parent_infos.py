@@ -17,16 +17,16 @@ class ParentInfosCRUD:
             joinedload(ParentInfos.activity),
         )
         result = await self.db_session.execute(stmt)
-        parent_infos = result.scalars().all()
+        parent_infos = result.unique().scalars().all()
         return parent_infos
 
-    async def get_parent_info_by_id(self, parent_info_id: int):
+    async def get_parent_info_by_id(self, parent_info_id: int) -> parent_schema.Base:
         stmt = select(ParentInfos).options(
             joinedload(ParentInfos.activity),
         ).filter_by(parent_info_id=parent_info_id)
         result = await self.db_session.execute(stmt)
-        parent_infos = result.scalars().all()
-        return parent_infos
+        parent_info = result.scalars().first()
+        return parent_info
 
     async def create_parent_info(self, parent_info: parent_schema.Create) -> parent_schema.Base:
         db_parent_info = ParentInfos(
