@@ -161,7 +161,7 @@ async def auth_callback(request: Request, db: UserCRUD = Depends(get_user_crud),
             await db.create_user(user_create)
 
         access_token_project = await create_access_token(data={"sub": preferred_username})      
-        return RedirectResponse(url=f"{FRONTEND_URL}/login?access_token={access_token_project}")
+        return RedirectResponse(url=f"{FRONTEND_URL}/#/login?access_token={access_token_project}")
     
     return JSONResponse({"error": "Authentication failed"})
 

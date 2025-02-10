@@ -87,14 +87,9 @@ class Activities(Base):
     notes = relationship("Notes")
     parent_infos = relationship("ParentInfos")
 
-    def __init__(self, description: str, start_time: datetime, end_time: datetime, location: str, curriculum_reference: str, cost: float, transfer_cost:float):
-        self.location = location
-        self.description = description
-        self.curriculum_reference = curriculum_reference
-        self.cost = cost
-        self.transfer_cost = transfer_cost
-        self.start_time = start_time
-        self.end_time = end_time
+    def __repr__(self) -> str:
+        return f"<Activities(location={self.location}, description={self.description}, curriculum_reference={self.curriculum_reference}, cost={self.cost}, transfer_cost={self.transfer_cost}, start_time={self.start_time}, end_time={self.end_time})>"
+    
 
 class Classes(Base):
     __tablename__ = "classes"
@@ -104,9 +99,9 @@ class Classes(Base):
 
     activities = relationship("Activities", secondary=class_activity, back_populates="classes")
 
-    def __init__(self, girl_count: int, boy_count: int):
-        self.girl_count = girl_count
-        self.boy_count = boy_count
+    def __repr__(self) -> str:
+        return f"<Classes(girl_count={self.girl_count}, boy_count={self.boy_count})>"
+
 
 class Notes(Base):
     __tablename__ = "notes"
@@ -126,6 +121,8 @@ class ParentInfos(Base):
     parent_info_id = Column(Integer, primary_key=True, autoincrement=True)
     activity_id = Column(Integer, ForeignKey("activities.activity_id"))
     text = Column(String)
+
+    activity = relationship("Activities", back_populates="parent_infos")
 
     def __init__(self, text: str, activity_id: int):
         self.text = text
