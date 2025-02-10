@@ -20,10 +20,7 @@ export const useAuthStore = defineStore("auth", () => {
   const loadingStore = useLoadingStore();
   const dialogStore = useDialogStore();
 
-  const isAuthenticated = computed(
-    () =>
-      access_token.value
-  );
+  const isAuthenticated = computed(() => access_token.value);
   const get_access_token = computed(() => access_token.value);
   const get_approvement_permission = computed(
     () => approvement_permission.value
@@ -95,14 +92,13 @@ export const useAuthStore = defineStore("auth", () => {
 
     loadingStore.setLoading();
 
-    apiLoginSuperuser(form)
+    await apiLoginSuperuser(form)
       .then((res) => {
         access_token.value = res.data.access_token;
-        approvement_permission.value = res.data.role.approvement_permission;
-        super_approvement_permission.value =
-          res.data.role.super_approvement_permission;
-        request_permission.value = res.data.role.request_permission;
-        change_permission.value = res.data.role.change_permission;
+        approvement_permission.value = true;
+        super_approvement_permission.value = true;
+        request_permission.value = true;
+        change_permission.value = true;
 
         dialogStore.setSuccess({
           title: "Login Success",

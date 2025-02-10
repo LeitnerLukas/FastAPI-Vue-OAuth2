@@ -39,7 +39,7 @@ const form = ref({
 const auth = useAuthStore();
 
 const submit = async () => {
-  await auth.superuserLogin(form.value);
+  await auth.superuserLogin(form.value.api_key);
 };
 
 onMounted(() => {
