@@ -17,10 +17,10 @@ class ClassCRUD:
             joinedload(Classes.activities),
         )
         result = await self.db_session.execute(stmt)
-        classes = result.scalars().all()
+        classes = result.unique().scalars().all()
         return classes
     
-    async def get_class_by_id(self, class_id: str):
+    async def get_class_by_id(self, class_id: str) -> class_schema.Base:
         stmt = select(Classes).options(
             joinedload(Classes.activities),
         ).filter_by(class_id=class_id)
