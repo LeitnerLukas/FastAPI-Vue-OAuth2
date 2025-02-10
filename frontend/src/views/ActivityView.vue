@@ -143,11 +143,12 @@ const fetchActivity = () => {
   }
 };
 
-const saveNote = () => {
+const saveNote = async () => {
   if (!note.value.trim()) {
     alert('Note cannot be empty.');
     return;
   }
+  await createNote(note.value);
   console.log('Saving note:', note.value, activityId.value);
   // Add backend API call here
 };
