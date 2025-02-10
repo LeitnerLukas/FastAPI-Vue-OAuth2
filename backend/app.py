@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api import user, auth, activities, classes, parent_infos
+from api import user, auth, test, activities, classes, parent_infos
 from database.config import engine, database, Base
 
 
@@ -11,6 +11,7 @@ app.include_router(user.router, prefix="/api")
 app.include_router(activities.router, prefix="/api")
 app.include_router(classes.router, prefix="/api")
 app.include_router(parent_infos.router, prefix="/api")
+app.include_router(test.router)
 
 
 methods = [
@@ -22,9 +23,9 @@ methods = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://localhost:5173", "https://localhost:8008"],
     allow_credentials=True,
-    allow_methods=methods,
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 

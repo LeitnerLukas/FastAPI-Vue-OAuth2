@@ -43,6 +43,7 @@ class ActivityCRUD:
             transfer_cost=activity.transfer_cost,
             start_time=activity.start_time,
             end_time=activity.end_time,
+            sga_approved=activity.sga_approved,
         )
         self.db_session.add(db_activity)
         await self.db_session.commit()
@@ -59,7 +60,8 @@ class ActivityCRUD:
                 transfer_cost=activity.transfer_cost,
                 start_time=activity.start_time,
                 end_time=activity.end_time,
-                last_update=activity.last_update
+                last_update=activity.last_update,
+                sga_approved=activity.sga_approved
             )
         )
         stmt_activities.execution_options(synchronize_session="fetch")

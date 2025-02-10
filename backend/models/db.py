@@ -45,10 +45,6 @@ class UserModels(Base):
         self.username = username
         self.name = name
 
-
-    def __repr__(self) -> str:
-        return f"<UserModels(username={self.username}, name={self.name}, roleId={self.roleId})>"
-
 class Roles(Base):
     __tablename__ = "roles"
     name = Column(String, unique=True, primary_key=True)
@@ -65,9 +61,6 @@ class Roles(Base):
         self.super_approvement_permission = super_approvement_permission
         self.request_permission = request_permission
         self.change_permission = change_permission
-    
-    def __repr__(self) -> str:
-        return f"<Roles(name={self.name}, approvement_permission={self.approvement_permission}, super_approvement_permission={self.super_approvement_permission}, request_permission={self.request_permission}, change_permission={self.change_permission})>"
     
 
 class Activities(Base):
@@ -122,9 +115,6 @@ class Notes(Base):
         self.event_state = event_state
         self.note = note
         self.activity_id = activity_id
-
-    def __repr__(self) -> str:
-        return f"<Notes(note={self.note})>" 
 
 class ParentInfos(Base):
     __tablename__ = "parent_infos"

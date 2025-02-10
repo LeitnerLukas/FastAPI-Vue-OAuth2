@@ -11,7 +11,7 @@ from auth.utils import create_access_token, create_refresh_token
 from crud.dependencies import get_user_crud
 from crud.user import UserCRUD
 from schemas.token import Token
-from schemas.user import Create
+from schemas.user import Create, DB
 from setting.config import get_settings
 from os import getenv
 from msal import ConfidentialClientApplication
@@ -33,30 +33,53 @@ settings = get_settings()
 router = APIRouter(tags=["auth"])
 SCOPES = ["User.Read"]
 
+@router.post("/superuser-login", response_model=Token)
+async def superuser_login(
+    response: Response,
+    api_key: str,
+    db: UserCRUD = Depends(get_user_crud),
+):
+    user: DB = await db.get_user_by_username("superuser")
+    if not user:
+        user: DB = db.create_user(Create(username="superuser", name="superuser"))
+    
+    superuser_api_key = settings.superuser_api_key
+    if api_key != superuser_api_key:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid API key",
+        )
+
+    username = "superuser"
+    access_token = await create_access_token(data={"username": username})
+    refresh_token = await create_refresh_token(data={"username": username})
+
+    db.update_user_login(username)
+    expires_at = (datetime.now() + timedelta(minutes=settings.refresh_token_expire_minutes)).timestamp()
+
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        samesite="none",
+        secure=True,
+        path="/",  # Explicitly set path
+        domain="localhost"
+    )
+
+    return Token(
+        access_token=access_token,
+        expires_in=int(expires_at),
+        token_type="Bearer",
+    )
 
 @router.post("/login", response_model=Token)
 async def login(
     response: Response,
-    form_data: OAuth2PasswordRequestForm = Depends(),
+    api_key: str,
     db: UserCRUD = Depends(get_user_crud),
 ):
-    return "deprecated"
-    user = await validate_user(form_data.username, form_data.password)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    access_token = await create_access_token(data={"username": form_data.username})
-    refresh_token = await create_refresh_token(data={"username": form_data.username})
-
-    await db.update_user_login(username=form_data.username)
-    expired_time = (
-        int(datetime.now(tz=timezone.utc).timestamp() * 1000)
-        + timedelta(minutes=settings.access_token_expire_minutes).seconds * 1000
-    )
+    return "depricated"
 
     response.set_cookie(
         "refresh_token",
@@ -80,23 +103,21 @@ async def refresh(
     response: Response,
     db: UserCRUD = Depends(get_user_crud),
 ):
-    return "deprecated"
     credentials_exception = HTTPException(
-        status_code=401,
+        status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
         refresh_token = request.cookies.get("refresh_token")
         if not refresh_token:
-            raise credentials_exception
-
+            raise HTTPException(detail="No refresh token", status_code=401)
+        
         payload = jwt.decode(
             refresh_token,
             settings.refresh_token_secret,
             algorithms=["HS256"],
         )
-
         username: str = payload.get("username")
         if username is None:
             raise credentials_exception
@@ -106,28 +127,33 @@ async def refresh(
         raise credentials_exception
 
     access_token = await create_access_token(data={"username": username})
-    refresh_token = await create_refresh_token(data={"username": username})
+    new_refresh_token = await create_refresh_token(data={"username": username})
 
     db.update_user_login(username)
-    expired_time = (
-        int(datetime.now(tz=timezone.utc).timestamp() * 1000)
-        + timedelta(minutes=settings.access_token_expire_minutes).seconds * 1000
-    )
+    expires_at = (datetime.utcnow() + timedelta(minutes=settings.refresh_token_expire_minutes)).timestamp()
 
     response.set_cookie(
-        "refresh_token",
-        refresh_token,
+        key="refresh_token",
+        value=new_refresh_token,
         httponly=True,
-        samesite="strict",
-        secure=False,
-        expires=timedelta(settings.refresh_token_expire_minutes),
+        samesite="none",
+        secure=True,
+        path="/",  # Explicitly set path
+        domain="localhost"
     )
 
     return Token(
         access_token=access_token,
-        expires_in=expired_time,
+        expires_in=int(expires_at),
         token_type="Bearer",
     )
+
+@router.get("/check-cookie")
+async def check_cookie(request: Request):
+    refresh_token = request.cookies.get("refresh_token")
+    if refresh_token:
+        return {"message": "Cookie is set!", "refresh_token": refresh_token}
+    return {"message": "No cookie found"}
 
 @router.get("/ms/login")
 async def ms_login():
@@ -139,7 +165,7 @@ async def ms_login():
 
 
 @router.get("/oauth2-redirect")
-async def auth_callback(request: Request, db: UserCRUD = Depends(get_user_crud),):
+async def auth_callback(response: Response, request: Request, db: UserCRUD = Depends(get_user_crud)):
     code = request.query_params.get("code")
     
     result = app_instance.acquire_token_by_authorization_code(
@@ -154,13 +180,34 @@ async def auth_callback(request: Request, db: UserCRUD = Depends(get_user_crud),
         user_data = requests.get("https://graph.microsoft.com/v1.0/me", headers=headers).json()
         
         preferred_username = user_data.get("userPrincipalName")  # Or use "mail" if preferred
+        displayName = user_data.get("displayName")
+        print(f"preferred_username: {preferred_username}")
+        user_create = Create(username=preferred_username, name=displayName)
+        if not await db.get_user_by_username(preferred_username):
+            await db.create_user(user_create)
 
-        user_create = Create(username=preferred_username, name=preferred_username)
-        db.create_user(user_create)
+        access_token_project = await create_access_token(data={"username": preferred_username})
+        refresh_token = await create_refresh_token(data={"username": preferred_username})
 
-        access_token_project = await create_access_token(data={"sub": preferred_username})      
-        return RedirectResponse(url=f"{FRONTEND_URL}/#/login?access_token={access_token_project}")
-    
+        print(refresh_token)
+
+        response.set_cookie(
+            key="refresh_token",
+            value=refresh_token,
+            httponly=True,
+            samesite="none",
+            secure=True,
+            path="/",  # Explicitly set path
+            domain="localhost"
+        )
+
+        # Debugging: Print response headers
+        print(response.headers)
+
+        return JSONResponse(
+            content={"access_token": access_token_project, "redirect_url": f"{FRONTEND_URL}/login"},
+            status_code=200
+        )
     return JSONResponse({"error": "Authentication failed"})
 
 
