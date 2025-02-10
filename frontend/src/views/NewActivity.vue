@@ -152,6 +152,14 @@ export default {
         starting_date: '',
         ending_date: '',
       };
+
+      createActivity(this.activity)
+        .then(() => {
+          this.$router.push({ name: 'Activities' });
+        })
+        .catch((error) => {
+          console.error('Error adding activity:', error);
+        });
     },
   },
 };
