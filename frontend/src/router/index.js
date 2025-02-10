@@ -12,22 +12,17 @@ import RegisterView from '../views/RegisterView.vue';
 
 const routes = [
   {
-    path: '/api',
+    path: '/',
     name: 'Home',
     component: HomeView,
   },
   {
-    path: '/apilogin',
+    path: '/login',
     name: 'Login',
     component: LoginView,
   },
   {
-    path: '/apiregister',
-    name: 'Register',
-    component: RegisterView,
-  },
-  {
-    path: '/apiregister',
+    path: '/register',
     name: 'Register',
     path: '/register',
     name: 'Register',
@@ -40,30 +35,30 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
-    path: '/apiuser_manage',
+    path: '/user_manage',
     name: 'UserManage',
     component: UserManagementView,
     meta: { requiresAuth: true },
   },
   {
-    path: '/apiactivity/:id',
+    path: '/activity/:id',
     name: 'ActivityView',
     component: ActivityView, // Use ActivityView for the /activity/:id route
     props: true, // Pass the route params as props
   },
   {
-    path: '/apiactivity/new',
+    path: '/activity/new',
     name: 'NewActivity',
     component: NewActivity, // Use NewActivityView for the /activity/new route
     meta: { requiresAuth: true },
   },
   {
-    path: '/apilogout',
+    path: '/logout',
     name: 'Logout',
     component: LogoutView,
   },
   {
-    path: '/apirefresh',
+    path: '/refresh',
     name: 'Refresh',
     component: RefreshView,
   },
@@ -81,13 +76,13 @@ router.beforeEach((to, from, next) => {
       next();
       return;
     }
-    next('/apilogin');
+    next('/login');
   } else {
     if (
-      to.path === '/apiuser_manage' &&
+      to.path === '/user_manage' &&
       auth.super_approvement_permission !== true
     ) {
-      next('/apidashboard');
+      next('/dashboard');
     }
     next();
   }

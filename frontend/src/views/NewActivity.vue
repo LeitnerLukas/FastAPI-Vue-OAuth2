@@ -114,17 +114,17 @@
 </template>
 
 <script>
+import { createActivity } from '../api/activities';
 export default {
   name: 'AddActivity',
   data() {
     return {
       activity: {
-        activityId: null,
         location: '',
-        curriculum_reference: '',
         description: '',
-        cost: 0.0,
-        transfer_cost: 0.0,
+        curriculum_reference: '',
+        cost: 0,
+        transfer_cost: 0,
         sga_approved: false,
         starting_date: '',
         ending_date: '',
@@ -142,12 +142,11 @@ export default {
 
       // Reset the form
       this.activity = {
-        activityId: null,
         location: '',
-        curriculum_reference: '',
         description: '',
-        cost: 0.0,
-        transfer_cost: 0.0,
+        curriculum_reference: '',
+        cost: 0,
+        transfer_cost: 0,
         sga_approved: false,
         starting_date: '',
         ending_date: '',
