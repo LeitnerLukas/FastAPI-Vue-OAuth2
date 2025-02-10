@@ -113,53 +113,50 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { createActivity } from '../api/activities';
-export default {
-  name: 'AddActivity',
-  data() {
-    return {
-      activity: {
-        location: '',
-        description: '',
-        curriculum_reference: '',
-        cost: 0,
-        transfer_cost: 0,
-        sga_approved: false,
-        starting_date: '',
-        ending_date: '',
-      },
-    };
-  },
-  methods: {
-    async addActivity() {
-      if (this.activity.starting_date >= this.activity.ending_date) {
-        alert('Starting date must be before the ending date.');
-        return;
-      }
 
-      console.log('Activity added:', this.activity);
+const router = useRouter();
 
-      // Reset the form
-      this.activity = {
-        location: '',
-        description: '',
-        curriculum_reference: '',
-        cost: 0,
-        transfer_cost: 0,
-        sga_approved: false,
-        starting_date: '',
-        ending_date: '',
-      };
+const activity = ref({
+  location: '',
+  description: '',
+  curriculum_reference: '',
+  cost: 0,
+  transfer_cost: 0,
+  sga_approved: false,
+  starting_date: '',
+  ending_date: '',
+});
 
-      await createActivity(this.activity)
-        .then(() => {
-          this.$router.push({ name: 'Activities' });
-        })
-        .catch((error) => {
-          console.error('Error adding activity:', error);
-        });
-    },
-  },
+const addActivity = async () => {
+  if (activity.value.starting_date >= activity.value.ending_date) {
+    alert('Starting date must be before the ending date.');
+    return;
+  }
+
+  console.log('Activity added:', activity.value);
+
+  // Reset the form
+  const newActivity = {
+    location: '',
+    description: '',
+    curriculum_reference: '',
+    cost: 0,
+    transfer_cost: 0,
+    sga_approved: false,
+    starting_date: '',
+    ending_date: '',
+  };
+  Object.assign(activity.value, newActivity);
+
+  try {
+    await createActivity(activity.value);
+    router.push({ name: 'Activities' });
+  } catch (error) {
+    console.error('Error adding activity:', error);
+  }
 };
 </script>
