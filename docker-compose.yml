@@ -15,11 +15,12 @@ services:
     build: ./backend
     # image: jasonbigcow/oauth2-fastapi
     ports:
-      - 5001:5001
+      - 8008:8008
     volumes:
       - ./backend/:/usr/backend/
     env_file:
       - ./backend/production.env
+      - ./backend/.env
     command: python3 run.py --prod
     restart: always
     depends_on:

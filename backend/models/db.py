@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from sqlalchemy import Column, String, DATE, DateTime, Boolean, Integer, Table, ForeignKey
+from sqlalchemy import Column, String, DateTime, Boolean, Integer, Table, ForeignKey, Enum
 from sqlalchemy.orm import relationship
-from crud.dependencies import AcceptState
+from crud.types import AcceptState
 
 from database.config import Base
 
@@ -35,21 +35,15 @@ class UserModels(Base):
     __tablename__ = "users"
     username = Column(String, unique=True, primary_key=True)
     name = Column(String)
-    roleId = Column(String, default="teacher", nullable=False)
     create_time = Column(DateTime, default=datetime.now())
     last_login = Column(DateTime, default=datetime.now())
 
     roles = relationship("Roles", secondary=user_role, back_populates="users")
     activities = relationship("Activities", secondary=user_activity, back_populates="users")
 
-    def __init__(self, username: str, name: str, roleId: int):
+    def __init__(self, username: str, name: str):
         self.username = username
         self.name = name
-        self.roleId = roleId
-
-
-    def __repr__(self) -> str:
-        return f"<UserModels(username={self.username}, name={self.name}, roleId={self.roleId})>"
 
 class Roles(Base):
     __tablename__ = "roles"
@@ -68,9 +62,6 @@ class Roles(Base):
         self.request_permission = request_permission
         self.change_permission = change_permission
     
-    def __repr__(self) -> str:
-        return f"<Roles(name={self.name}, approvement_permission={self.approvement_permission}, super_approvement_permission={self.super_approvement_permission}, request_permission={self.request_permission}, change_permission={self.change_permission})>"
-    
 
 class Activities(Base):
     __tablename__ = "activities"
@@ -86,15 +77,15 @@ class Activities(Base):
     end_time = Column(DateTime)
 
     sga_approved = Column(Boolean, default=False)
-    state = Column(AcceptState, default=AcceptState.REQUESTED)
+    state = Column(Enum(AcceptState), default=AcceptState.REQUESTED)
 
     create_time = Column(DateTime, default=datetime.now())
     last_update = Column(DateTime, default=datetime.now())
 
     users = relationship("UserModels", secondary=user_activity, back_populates="activities")
     classes = relationship("Classes", secondary=class_activity, back_populates="activities")
-    notes = relationship("Notes", back_populates="activity")
-    parent_infos = relationship("ParentInfos", back_populates="activity")
+    notes = relationship("Notes")
+    parent_infos = relationship("ParentInfos")
 
     def __init__(self, description: str, start_time: datetime, end_time: datetime, location: str, curriculum_reference: str, cost: float, transfer_cost:float):
         self.location = location
@@ -105,13 +96,9 @@ class Activities(Base):
         self.start_time = start_time
         self.end_time = end_time
 
-    def __repr__(self) -> str:
-        return f"<Activities(location={self.location}, description={self.description}, curriculum_reference={self.curriculum_reference}, cost={self.cost}, transfer_cost={self.transfer_cost}, start_time={self.start_time}, end_time={self.end_time})>"
-    
-
 class Classes(Base):
     __tablename__ = "classes"
-    class_id = Column(Integer, primary_key=True, autoincrement=True)
+    class_id = Column(String, primary_key=True)
     girl_count = Column(Integer)
     boy_count = Column(Integer)
 
@@ -121,27 +108,18 @@ class Classes(Base):
         self.girl_count = girl_count
         self.boy_count = boy_count
 
-    def __repr__(self) -> str:
-        return f"<Classes(girl_count={self.girl_count}, boy_count={self.boy_count})>"
-
-
 class Notes(Base):
     __tablename__ = "notes"
     note_id = Column(Integer, primary_key=True, autoincrement=True)
-    event_state = Column(AcceptState)
+    event_state = Column(Enum(AcceptState))
     note = Column(String)
     activity_id = Column(Integer, ForeignKey("activities.activity_id"))
     create_time = Column(DateTime, default=datetime.now())
-
-    activity = relationship("Activities", back_populates="notes")
 
     def __init__(self, event_state: AcceptState, note: str, activity_id: int):
         self.event_state = event_state
         self.note = note
         self.activity_id = activity_id
-
-    def __repr__(self) -> str:
-        return f"<Notes(note={self.note})>" 
 
 class ParentInfos(Base):
     __tablename__ = "parent_infos"
@@ -149,10 +127,7 @@ class ParentInfos(Base):
     activity_id = Column(Integer, ForeignKey("activities.activity_id"))
     text = Column(String)
 
-    activity = relationship("Activities", back_populates="notes")
-
     def __init__(self, text: str, activity_id: int):
         self.text = text
         self.activity_id = activity_id
     
-
