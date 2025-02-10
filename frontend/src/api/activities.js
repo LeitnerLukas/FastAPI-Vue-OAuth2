@@ -1,9 +1,10 @@
+import request from './req';
 import axios from 'axios';
 
-export const apiGetActivities = () => axios.get('/api/activities');
+export const apiGetActivities = () => request('GET', '/activities');
 export const apiGetActivity = (activityId) =>
-  axios.get(`/api/activities/${activityId}`);
+  request('GET', `/activities/${activityId}`);
 export const createActivity = (activity) =>
-  axios.post('/api/apiactivities', activity);
+  request('POST', '/activities', activity);
 export const updateActivity = (activity) =>
-  axios.put(`/api/activities/${activity.id}`, activity);
+  request('PUT', `/activities/${activity.id}`, activity);

@@ -153,7 +153,7 @@ export default {
         ending_date: '',
       };
 
-      createActivity(this.activity)
+      await createActivity(this.activity)
         .then(() => {
           this.$router.push({ name: 'Activities' });
         })

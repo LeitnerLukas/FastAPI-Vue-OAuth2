@@ -1,3 +1,3 @@
 import axios from 'axios';
 
-export const apiGetActivities = () => axios.get('/api/activities/approve');
+export const apiGetActivities = () => axios.get('/activities/approve');
