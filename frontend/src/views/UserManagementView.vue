@@ -206,6 +206,8 @@
             <td>{{ item.class_id }}</td>
             <td>
               <input
+                class="form-control"
+                type="number"
                 v-model="item.girl_count"
                 @input="
                   updateClassData(
@@ -218,6 +220,8 @@
             </td>
             <td>
               <input
+                class="form-control"
+                type="number"
                 v-model="item.boy_count"
                 @input="
                   updateClassData(
