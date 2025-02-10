@@ -4,6 +4,7 @@ import {
   apiLogin,
   apiRefresh,
   apiLogout,
+  apiLoginSuperuser,
 } from "../api/auth";
 import { useLoadingStore } from "./loading";
 import { useDialogStore } from "./dialog";
@@ -43,6 +44,58 @@ export const useAuthStore = defineStore("auth", () => {
     loadingStore.setLoading();
 
     apiLogin(form)
+      .then((res) => {
+        access_token.value = res.data.access_token;
+        approvement_permission.value = res.data.role.approvement_permission;
+        super_approvement_permission.value =
+          res.data.role.super_approvement_permission;
+        request_permission.value = res.data.role.request_permission;
+        change_permission.value = res.data.role.change_permission;
+
+        dialogStore.setSuccess({
+          title: "Login Success",
+          firstLine: "You can login now",
+          secondLine: "This dialog will close in 1 seconds",
+        });
+      })
+      .catch((err) => {
+        dialogStore.setError({
+          title: "Login Failed",
+          firstLine: "Please check your input",
+          secondLine: "This dialog will close in 1 seconds",
+        });
+        access_token.value = null;
+        approvement_permission.value = null;
+        super_approvement_permission.value = null;
+        request_permission.value = null;
+        change_permission.value = null;
+      })
+      .finally(() => {
+        loadingStore.clearLoading();
+        setTimeout(() => {
+          dialogStore.reset();
+
+          console.log(isAuthenticated.value);
+          console.log(access_token.value);
+
+          if (isAuthenticated.value) {
+            router.push("/dashboard");
+            console.log("pushed to profile");
+          }
+        }, 1000);
+      });
+  }
+
+  async function superuserLogin(form) {
+    access_token.value = null;
+    approvement_permission.value = null;
+    super_approvement_permission.value = null;
+    request_permission.value = null;
+    change_permission.value = null;
+
+    loadingStore.setLoading();
+
+    apiLoginSuperuser(form)
       .then((res) => {
         access_token.value = res.data.access_token;
         approvement_permission.value = res.data.role.approvement_permission;
@@ -197,6 +250,7 @@ export const useAuthStore = defineStore("auth", () => {
     login,
     logout,
     refresh,
+    superuserLogin,
     refreshForLogin,
   };
 });
