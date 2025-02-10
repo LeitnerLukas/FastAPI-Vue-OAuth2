@@ -78,5 +78,3 @@ def create_note_for_activity(activity_id: int, note: NoteCreate, db: Session = D
     db.commit()
     db.refresh(db_note)
     return db_note
-
-    return db_note
