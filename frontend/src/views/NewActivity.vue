@@ -132,7 +132,7 @@ export default {
     };
   },
   methods: {
-    addActivity() {
+    async addActivity() {
       if (this.activity.starting_date >= this.activity.ending_date) {
         alert('Starting date must be before the ending date.');
         return;
