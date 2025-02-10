@@ -20,7 +20,7 @@ async def create_class(new_class: class_schema.Create, db: ClassCRUD = Depends(g
     await db.create_class(new_class)
     return new_class
 
-@router.put("")
+@router.put("/{classId}")
 async def update_class(classId: str, class_: class_schema.Update, db: ClassCRUD = Depends(get_classes_crud)):
     await db.update_class(classId, class_)
     return class_
