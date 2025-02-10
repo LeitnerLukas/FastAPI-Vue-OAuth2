@@ -3,7 +3,7 @@
   <div class="dashboard">
     <div class="header">
       <h1>Dashboard</h1>
-      <router-link :to="'/activity/new'" class="btn btn-primary">
+      <router-link :to="'/apiactivity/new'" class="btn btn-primary">
         New Activity
       </router-link>
     </div>

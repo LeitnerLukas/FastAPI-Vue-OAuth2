@@ -44,7 +44,7 @@
       </p>
 
       <router-link
-        :to="'/activity/' + entity.activityId"
+        :to="'/apiactivity/' + entity.activityId"
         class="btn btn-primary"
       >
         View Details

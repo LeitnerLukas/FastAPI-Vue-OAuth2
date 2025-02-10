@@ -1,5 +1,5 @@
-import request from "./req";
-import axios from "axios";
+import request from './req';
+import axios from 'axios';
 
 export const getClasses = () => request('GET', '/classes');
 export const createClass = (data) => request('POST', '/classes', data);

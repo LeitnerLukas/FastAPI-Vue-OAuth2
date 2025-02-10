@@ -132,7 +132,7 @@ export default {
     };
   },
   methods: {
-    addActivity() {
+    async addActivity() {
       if (this.activity.starting_date >= this.activity.ending_date) {
         alert('Starting date must be before the ending date.');
         return;
@@ -152,6 +152,14 @@ export default {
         starting_date: '',
         ending_date: '',
       };
+
+      await createActivity(this.activity)
+        .then(() => {
+          this.$router.push({ name: 'Activities' });
+        })
+        .catch((error) => {
+          console.error('Error adding activity:', error);
+        });
     },
   },
 };
