@@ -1,7 +1,7 @@
 import request from "./req";
 import axios from "axios";
 
-export const getClasses = () => request('GET', '/classes/classes');
-export const createClass = (data) => request('POST', '/classes/classes', data);
-export const updateClass = (id, data) => request("PUT", `/api/classes/${id}`, data);
-export const deleteClass = (id) => request("DELETE", `/classes/classes/${id}`);
+export const getClasses = () => request('GET', '/classes');
+export const createClass = (data) => request('POST', '/classes', data);
+export const updateClass = (classId, data) => request("PUT", `/classes/${classId}`, data);
+export const deleteClass = (id) => request("DELETE", `/classes/${id}`);

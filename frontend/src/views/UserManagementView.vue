@@ -203,19 +203,36 @@
         <tbody>
           <tr v-for="(item, idx) in classes" :key="idx">
             <th scope="row">{{ idx + 1 }}</th>
-            <td>{{ item.classId }}</td>
+            <td>{{ item.class_id }}</td>
             <td>
               <input
-                v-model="item.girls"
-                @input="updateClassData(item.id, item.girls, item.boys)"
+                v-model="item.girl_count"
+                @input="
+                  updateClassData(
+                    item.class_id,
+                    item.girl_count,
+                    item.boy_count
+                  )
+                "
               />
             </td>
-            <td><input
-                v-model="item.boys"
-                @input="updateClassData(item.id, item.girls, item.boys)"
-              /></td>
             <td>
-              <button class="btn btn-danger" @click="removeClass(item.classId)">
+              <input
+                v-model="item.boy_count"
+                @input="
+                  updateClassData(
+                    item.class_id,
+                    item.girl_count,
+                    item.boy_count
+                  )
+                "
+              />
+            </td>
+            <td>
+              <button
+                class="btn btn-danger"
+                @click="removeClass(item.class_id)"
+              >
                 Remove
               </button>
             </td>
@@ -237,6 +254,7 @@ import {
 import { deleteUser, updateUserRole } from "../api/superuser";
 import { getUsers } from "../api/user";
 import { createRole, deleteUserRole, getRoles } from "../api/roles";
+import { useDialogStore } from "../store/dialog";
 
 const classData = ref({
   id: "",
@@ -256,13 +274,15 @@ const roles = ref([]);
 const classes = ref([]);
 const users = ref([]);
 
+const dialogStore = useDialogStore();
+
 const fetchRoles = async () => {
   roles.value = JSON.parse(await getRoles());
 };
 
 const fetchClasses = async () => {
-  console.log(JSON.parse(await getClasses()));
-  classes.value = JSON.parse(await getClasses());
+  const fetchedClass = await getClasses();
+  classes.value = fetchedClass.data;
 };
 
 const fetchUsers = async () => {
@@ -270,53 +290,148 @@ const fetchUsers = async () => {
 };
 
 const submitClass = async (newClass) => {
-  createClass(classData.value);
-  classData.value.push(newClass);
-};
-
-const submitRole = () => {
-  createRole(roleData.value);
-  roles.value.push(roleData.value);
-};
-
-const addUserRole = async (userId, roleId) => {
-  updateUserRole(userId, roleId);
-  const user = users.value.find((user) => user.id === userId);
-  const role = roles.value.find((role) => role.id === roleId);
-
-  if (user && role) {
-    const hasRole = user.roles.some((userRole) => userRole.id === roleId);
-    if (!hasRole) {
-      user.roles.push(role);
-    }
+  try {
+    await createClass({
+      class_id: newClass.id,
+      girl_count: newClass.girls,
+      boy_count: newClass.boys,
+    });
+    classes.value.push({
+      class_id: newClass.id,
+      girl_count: newClass.girls,
+      boy_count: newClass.boys,
+    });
+  } catch (error) {
+    dialogStore.setError({
+      title: "Error creating class",
+      firstLine: "",
+      secondLine: "",
+    });
+    setTimeout(() => {
+      dialogStore.reset();
+    }, 1000);
   }
 };
 
 const removeClass = async (classId) => {
-  deleteClass(classId);
-  classData.value = classData.value.filter(
-    (schoolClass) => schoolClass.id !== classId
-  );
+  try {
+    await deleteClass(classId);
+    classes.value = classes.value.filter(
+      (schoolClass) => schoolClass.class_id !== classId
+    );
+  } catch (error) {
+    dialogStore.setError({
+      title: "Error removing class",
+      firstLine: "",
+      secondLine: "",
+    });
+    setTimeout(() => {
+      dialogStore.reset();
+    }, 1000);
+  }
+};
+
+const submitRole = async () => {
+  try {
+    await createRole(roleData.value);
+    roles.value.push(roleData.value);
+  } catch (error) {
+    dialogStore.setError({
+      title: "Error creating role",
+      firstLine: "",
+      secondLine: "",
+    });
+    setTimeout(() => {
+      dialogStore.reset();
+    }, 1000);
+  }
+};
+
+const addUserRole = async (userId, roleId) => {
+  try {
+    await updateUserRole(userId, roleId);
+    const user = users.value.find((user) => user.id === userId);
+    const role = roles.value.find((role) => role.id === roleId);
+
+    if (user && role) {
+      const hasRole = user.roles.some((userRole) => userRole.id === roleId);
+      if (!hasRole) {
+        user.roles.push(role);
+      }
+    }
+  } catch (error) {
+    dialogStore.setError({
+      title: "Error adding role",
+      firstLine: "",
+      secondLine: "",
+    });
+    setTimeout(() => {
+      dialogStore.reset();
+    }, 1000);
+  }
 };
 
 const removeUser = async (userId) => {
-  deleteUser(userId);
-  users.value = users.value.filter((user) => user.id !== userId);
+  try {
+    await deleteUser(userId);
+    users.value = users.value.filter((user) => user.id !== userId);
+  } catch (error) {
+    dialogStore.setError({
+      title: "Error removing user",
+      firstLine: "",
+      secondLine: "",
+    });
+    setTimeout(() => {
+      dialogStore.reset();
+    }, 1000);
+  }
 };
 
 const removeUserRole = async (userId, roleId) => {
-  deleteUserRole(userId, roleId);
-  const userIndex = users.value.findIndex((user) => user.id === userId);
+  try {
+    await deleteUserRole(userId, roleId);
+    const userIndex = users.value.findIndex((user) => user.id === userId);
 
-  if (userIndex !== -1) {
-    users.value[userIndex].roles = users.value[userIndex].roles.filter(
-      (role) => role.id !== roleId
-    );
+    if (userIndex !== -1) {
+      users.value[userIndex].roles = users.value[userIndex].roles.filter(
+        (role) => role.id !== roleId
+      );
+    }
+  } catch (error) {
+    dialogStore.setError({
+      title: "Error removing role",
+      firstLine: "",
+      secondLine: "",
+    });
+    setTimeout(() => {
+      dialogStore.reset();
+    }, 1000);
   }
 };
 
 const updateClassData = async (classId, girls, boys) => {
-  updateClass(classId, { girl_count: girls, boy_count: boys });
+  try {
+    if (
+      girls !== null &&
+      girls !== undefined &&
+      boys !== null &&
+      boys !== undefined
+    ) {
+      await updateClass(classId, {
+        girl_count: parseInt(girls),
+        boy_count: parseInt(boys),
+      });
+    }
+  } catch (error) {
+    dialogStore.setError({
+      title: "Error updating class",
+      firstLine: "",
+      secondLine: "",
+    });
+    setTimeout(() => {
+      dialogStore.reset();
+    }, 1000);
+  }
 };
 
 onMounted(() => {

@@ -5,5 +5,5 @@ export const apiLogin = (form) =>
   axios.post("/login", qs.stringify(form), {
     headers: { "content-type": "application/x-www-form-urlencoded" },
   });
-export const apiRefresh = () => axios.post("/auth/refresh");
-export const apiLogout = () => axios.post("/auth/logout");
+export const apiRefresh = () => axios.post("/refresh");
+export const apiLogout = () => axios.post("/logout");
