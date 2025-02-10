@@ -20,9 +20,9 @@ methods = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://localhost:5173", "https://localhost:8008"],
     allow_credentials=True,
-    allow_methods=methods,
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
