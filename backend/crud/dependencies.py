@@ -2,6 +2,7 @@ from typing import Generator
 
 from database.config import async_session
 from crud.user import UserCRUD
+from crud.roles import RolesCRUD
 
 
 async def get_db() -> Generator:
@@ -14,3 +15,8 @@ async def get_user_crud() -> Generator:
     async with async_session() as session:
         async with session.begin():
             yield UserCRUD(session)
+
+async def get_roles_crud() -> Generator:
+    async with async_session() as session:
+        async with session.begin():
+            yield RolesCRUD(session)
