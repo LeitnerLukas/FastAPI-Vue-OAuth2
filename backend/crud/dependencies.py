@@ -33,6 +33,7 @@ async def get_parent_infos_crud() -> Generator:
     async with async_session() as session:
         async with session.begin():
             yield ParentInfosCRUD(session)
+
 async def get_roles_crud() -> Generator:
     async with async_session() as session:
         async with session.begin():
