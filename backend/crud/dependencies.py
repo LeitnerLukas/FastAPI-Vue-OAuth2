@@ -5,6 +5,7 @@ from crud.user import UserCRUD
 from crud.activities import ActivityCRUD
 from crud.classes import ClassCRUD
 from crud.parent_infos import ParentInfosCRUD
+from crud.roles import RolesCRUD
 
 
 async def get_db() -> Generator:
@@ -32,3 +33,7 @@ async def get_parent_infos_crud() -> Generator:
     async with async_session() as session:
         async with session.begin():
             yield ParentInfosCRUD(session)
+async def get_roles_crud() -> Generator:
+    async with async_session() as session:
+        async with session.begin():
+            yield RolesCRUD(session)

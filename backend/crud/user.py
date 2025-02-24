@@ -66,27 +66,16 @@ class UserCRUD:
         users = result.scalars().all()
         return users
 
-    async def create_user(self, user: user_schema.Create) -> user_schema.DB:
+    async def create_user(self, user: user_schema.DB) -> user_schema.DB:
         #if not await self.check_username(user.username):
         #    return None
         db_user = UserModels(
             username=user.username,
             name=user.name,
         )
-        self.db_session.add(db_user)
+        return_user = self.db_session.add(db_user)
         await self.db_session.commit()
-        return db_user
-    
-    async def super_user_login(self, username: str, api_key: str):
-        if api_key != "super_secret_key":
-            return None
-        db_user = await self.get_user_by_username(username)
-        if db_user is not None:
-            return None
-        db_user = UserModels(
-            username=username,
-            request_permission=True,
-        )
+        return return_user
 
     async def update_user_login(self, username: str):
         db_user = await self.get_user_by_username(username)
