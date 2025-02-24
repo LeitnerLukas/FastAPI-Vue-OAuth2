@@ -1,13 +1,14 @@
 <!-- src/views/DashboardView.vue -->
 <template>
+  <div class="container">
   <div class="dashboard">
-    <div class="header">
-      <h1>Dashboard</h1>
+    <div class="header d-flex justify-content-between align-items-center">
+      <h3>Dashboard</h3>
       <router-link :to="'/activity/new'" class="btn btn-primary">
         New Activity
       </router-link>
     </div>
-    <div class="entity-list">
+    <div class="entity-list mt-3">
       <EntityDisplay
         v-for="(entity, index) in entities"
         :key="index"
@@ -15,6 +16,7 @@
       />
     </div>
   </div>
+</div>
 </template>
 
 <script>
@@ -61,7 +63,8 @@ export default {
 
 <style scoped>
 .dashboard {
-  padding: 20px;
+  /* padding: 20px; */
+  margin-top: 20px;
 }
 
 .entity-list {

@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-4">
+  <!-- <div class="container mt-4">
     <h5>Create New Role</h5>
     <form @submit.prevent="submitRole">
       <div class="mb-3">
@@ -80,7 +80,7 @@
         </thead>
         <tbody>
           <tr v-for="(role, idx) in roles" :key="idx">
-            <th scope="row">{{ role.id }}</th>
+            <th scope="row">{{ idx }}</th>
             <td>{{ role.name }}</td>
             <td>{{ role.approvement_permission }}</td>
             <td>
@@ -114,10 +114,11 @@
         <tbody>
           <tr v-for="(user, idx) in users" :key="idx">
             <th scope="row">{{ idx + 1 }}</th>
-            <td>{{ user.email }}</td>
+            <td>{{ user.username }}</td>
             <td>{{ user.name }}</td>
             <td>
               <div
+                v-if="user.roles"
                 @click="removeUserRole(user.id, role.id)"
                 v-for="role in user.roles"
                 :key="role.id"
@@ -128,6 +129,7 @@
             </td>
             <td>
               <div
+                v-if="user.roles"
                 v-for="role in roles.filter(
                   (role) =>
                     !user.roles.some((userRole) => userRole.id === role.id)
@@ -244,203 +246,216 @@
         </tbody>
       </table>
     </div>
+  </div> -->
+  <div class="container mt-3">
+    <router-link to="/user_manage/users_roles">
+    <div class="p-3 border">
+      <h3>Users & Roles</h3>
+    </div>
+  </router-link>
+  <router-link to="/user_manage/classes">
+    <div class="p-3 border">
+      <h3>Classes</h3>
+    </div></router-link>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
-import {
-  createClass,
-  deleteClass,
-  getClasses,
-  updateClass,
-} from "../api/class";
-import { deleteUser, updateUserRole } from "../api/superuser";
-import { getUsers } from "../api/user";
-import { createRole, deleteUserRole, getRoles } from "../api/roles";
-import { useDialogStore } from "../store/dialog";
+// import { onMounted, ref } from "vue";
+// import {
+//   createClass,
+//   deleteClass,
+//   getClasses,
+//   updateClass,
+// } from "../api/class";
+// import { deleteUser, updateUserRole } from "../api/superuser";
+// import { getUsers } from "../api/user";
+// import { createRole, deleteUserRole, getRoles } from "../api/roles";
+// import { useDialogStore } from "../store/dialog";
 
-const classData = ref({
-  id: "",
-  girls: 0,
-  boys: 0,
-});
+// const classData = ref({
+//   id: "",
+//   girls: 0,
+//   boys: 0,
+// });
 
-const roleData = ref({
-  name: "",
-  approvement_permission: false,
-  super_approvement_permission: false,
-  request_permission: false,
-  change_permission: false,
-});
+// const roleData = ref({
+//   name: "",
+//   approvement_permission: false,
+//   super_approvement_permission: false,
+//   request_permission: false,
+//   change_permission: false,
+// });
 
-const roles = ref([]);
-const classes = ref([]);
-const users = ref([]);
+// const roles = ref([]);
+// const classes = ref([]);
+// const users = ref([]);
 
-const dialogStore = useDialogStore();
+// const dialogStore = useDialogStore();
 
-const fetchRoles = async () => {
-  roles.value = JSON.parse(await getRoles());
-};
+// const fetchRoles = async () => {
+//   const fetchedRoles = await getRoles();
+//   roles.value = fetchedRoles.data;
+// };
 
-const fetchClasses = async () => {
-  const fetchedClass = await getClasses();
-  classes.value = fetchedClass.data;
-};
+// const fetchClasses = async () => {
+//   const fetchedClass = await getClasses();
+//   classes.value = fetchedClass.data;
+// };
 
-const fetchUsers = async () => {
-  users.value = JSON.parse(await getUsers());
-};
+// const fetchUsers = async () => {
+//   const fetchedUsers = await getUsers();
+//   users.value = fetchedUsers.data;
+// };
 
-const submitClass = async (newClass) => {
-  try {
-    await createClass({
-      class_id: newClass.id,
-      girl_count: newClass.girls,
-      boy_count: newClass.boys,
-    });
-    classes.value.push({
-      class_id: newClass.id,
-      girl_count: newClass.girls,
-      boy_count: newClass.boys,
-    });
-  } catch (error) {
-    dialogStore.setError({
-      title: "Error creating class",
-      firstLine: "",
-      secondLine: "",
-    });
-    setTimeout(() => {
-      dialogStore.reset();
-    }, 1000);
-  }
-};
+// const submitClass = async (newClass) => {
+//   try {
+//     await createClass({
+//       class_id: newClass.id,
+//       girl_count: newClass.girls,
+//       boy_count: newClass.boys,
+//     });
+//     classes.value.push({
+//       class_id: newClass.id,
+//       girl_count: newClass.girls,
+//       boy_count: newClass.boys,
+//     });
+//   } catch (error) {
+//     dialogStore.setError({
+//       title: "Error creating class",
+//       firstLine: "",
+//       secondLine: "",
+//     });
+//     setTimeout(() => {
+//       dialogStore.reset();
+//     }, 1000);
+//   }
+// };
 
-const removeClass = async (classId) => {
-  try {
-    await deleteClass(classId);
-    classes.value = classes.value.filter(
-      (schoolClass) => schoolClass.class_id !== classId
-    );
-  } catch (error) {
-    dialogStore.setError({
-      title: "Error removing class",
-      firstLine: "",
-      secondLine: "",
-    });
-    setTimeout(() => {
-      dialogStore.reset();
-    }, 1000);
-  }
-};
+// const removeClass = async (classId) => {
+//   try {
+//     await deleteClass(classId);
+//     classes.value = classes.value.filter(
+//       (schoolClass) => schoolClass.class_id !== classId
+//     );
+//   } catch (error) {
+//     dialogStore.setError({
+//       title: "Error removing class",
+//       firstLine: "",
+//       secondLine: "",
+//     });
+//     setTimeout(() => {
+//       dialogStore.reset();
+//     }, 1000);
+//   }
+// };
 
-const submitRole = async () => {
-  try {
-    await createRole(roleData.value);
-    roles.value.push(roleData.value);
-  } catch (error) {
-    dialogStore.setError({
-      title: "Error creating role",
-      firstLine: "",
-      secondLine: "",
-    });
-    setTimeout(() => {
-      dialogStore.reset();
-    }, 1000);
-  }
-};
+// const submitRole = async () => {
+//   try {
+//     await createRole(roleData.value);
+//     roles.value.push(roleData.value);
+//   } catch (error) {
+//     dialogStore.setError({
+//       title: "Error creating role",
+//       firstLine: "",
+//       secondLine: "",
+//     });
+//     setTimeout(() => {
+//       dialogStore.reset();
+//     }, 1000);
+//   }
+// };
 
-const addUserRole = async (userId, roleId) => {
-  try {
-    await updateUserRole(userId, roleId);
-    const user = users.value.find((user) => user.id === userId);
-    const role = roles.value.find((role) => role.id === roleId);
+// const addUserRole = async (userId, roleId) => {
+//   try {
+//     await updateUserRole(userId, roleId);
+//     const user = users.value.find((user) => user.id === userId);
+//     const role = roles.value.find((role) => role.id === roleId);
 
-    if (user && role) {
-      const hasRole = user.roles.some((userRole) => userRole.id === roleId);
-      if (!hasRole) {
-        user.roles.push(role);
-      }
-    }
-  } catch (error) {
-    dialogStore.setError({
-      title: "Error adding role",
-      firstLine: "",
-      secondLine: "",
-    });
-    setTimeout(() => {
-      dialogStore.reset();
-    }, 1000);
-  }
-};
+//     if (user && role) {
+//       const hasRole = user.roles.some((userRole) => userRole.id === roleId);
+//       if (!hasRole) {
+//         user.roles.push(role);
+//       }
+//     }
+//   } catch (error) {
+//     dialogStore.setError({
+//       title: "Error adding role",
+//       firstLine: "",
+//       secondLine: "",
+//     });
+//     setTimeout(() => {
+//       dialogStore.reset();
+//     }, 1000);
+//   }
+// };
 
-const removeUser = async (userId) => {
-  try {
-    await deleteUser(userId);
-    users.value = users.value.filter((user) => user.id !== userId);
-  } catch (error) {
-    dialogStore.setError({
-      title: "Error removing user",
-      firstLine: "",
-      secondLine: "",
-    });
-    setTimeout(() => {
-      dialogStore.reset();
-    }, 1000);
-  }
-};
+// const removeUser = async (userId) => {
+//   try {
+//     await deleteUser(userId);
+//     users.value = users.value.filter((user) => user.id !== userId);
+//   } catch (error) {
+//     dialogStore.setError({
+//       title: "Error removing user",
+//       firstLine: "",
+//       secondLine: "",
+//     });
+//     setTimeout(() => {
+//       dialogStore.reset();
+//     }, 1000);
+//   }
+// };
 
-const removeUserRole = async (userId, roleId) => {
-  try {
-    await deleteUserRole(userId, roleId);
-    const userIndex = users.value.findIndex((user) => user.id === userId);
+// const removeUserRole = async (userId, roleId) => {
+//   try {
+//     await deleteUserRole(userId, roleId);
+//     const userIndex = users.value.findIndex((user) => user.id === userId);
 
-    if (userIndex !== -1) {
-      users.value[userIndex].roles = users.value[userIndex].roles.filter(
-        (role) => role.id !== roleId
-      );
-    }
-  } catch (error) {
-    dialogStore.setError({
-      title: "Error removing role",
-      firstLine: "",
-      secondLine: "",
-    });
-    setTimeout(() => {
-      dialogStore.reset();
-    }, 1000);
-  }
-};
+//     if (userIndex !== -1) {
+//       users.value[userIndex].roles = users.value[userIndex].roles.filter(
+//         (role) => role.id !== roleId
+//       );
+//     }
+//   } catch (error) {
+//     dialogStore.setError({
+//       title: "Error removing role",
+//       firstLine: "",
+//       secondLine: "",
+//     });
+//     setTimeout(() => {
+//       dialogStore.reset();
+//     }, 1000);
+//   }
+// };
 
-const updateClassData = async (classId, girls, boys) => {
-  try {
-    if (
-      girls !== null &&
-      girls !== undefined &&
-      boys !== null &&
-      boys !== undefined
-    ) {
-      await updateClass(classId, {
-        girl_count: parseInt(girls),
-        boy_count: parseInt(boys),
-      });
-    }
-  } catch (error) {
-    dialogStore.setError({
-      title: "Error updating class",
-      firstLine: "",
-      secondLine: "",
-    });
-    setTimeout(() => {
-      dialogStore.reset();
-    }, 1000);
-  }
-};
+// const updateClassData = async (classId, girls, boys) => {
+//   try {
+//     if (
+//       girls !== null &&
+//       girls !== undefined &&
+//       boys !== null &&
+//       boys !== undefined
+//     ) {
+//       await updateClass(classId, {
+//         girl_count: parseInt(girls),
+//         boy_count: parseInt(boys),
+//       });
+//     }
+//   } catch (error) {
+//     dialogStore.setError({
+//       title: "Error updating class",
+//       firstLine: "",
+//       secondLine: "",
+//     });
+//     setTimeout(() => {
+//       dialogStore.reset();
+//     }, 1000);
+//   }
+// };
 
-onMounted(() => {
-  fetchRoles();
-  fetchClasses();
-  fetchUsers();
-});
+// onMounted(() => {
+//   fetchRoles();
+//   fetchClasses();
+//   fetchUsers();
+// });
 </script>
