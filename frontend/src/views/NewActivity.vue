@@ -114,49 +114,57 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { createActivity } from '../api/activities';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { createActivity } from "../api/activities";
 
 const router = useRouter();
 
 const activity = ref({
-  location: '',
-  description: '',
-  curriculum_reference: '',
+  location: "",
+  description: "",
+  curriculum_reference: "",
   cost: 0,
   transfer_cost: 0,
   sga_approved: false,
-  starting_date: '',
-  ending_date: '',
+  starting_date: "",
+  ending_date: "",
 });
 
 const addActivity = async () => {
   if (activity.value.starting_date >= activity.value.ending_date) {
-    alert('Starting date must be before the ending date.');
+    alert("Starting date must be before the ending date.");
     return;
   }
 
-  console.log('Activity added:', activity.value);
-
-  // Reset the form
-  const newActivity = {
-    location: '',
-    description: '',
-    curriculum_reference: '',
-    cost: 0,
-    transfer_cost: 0,
-    sga_approved: false,
-    starting_date: '',
-    ending_date: '',
-  };
-  Object.assign(activity.value, newActivity);
+  console.log("Activity added:", activity.value);
 
   try {
-    await createActivity(activity.value);
-    router.push({ name: 'Activities' });
+    await createActivity({
+      location: activity.value.location,
+      description: activity.value.description,
+      curriculum_reference: activity.value.curriculum_reference,
+      cost: activity.value.cost,
+      transfer_cost: activity.value.transfer_cost,
+      sga_approved: activity.value.sga_approved,
+      starting_date: activity.value.starting_date,
+      ending_date: activity.value.ending_date,
+    });
+    // Reset the form
+    const newActivity = {
+      location: "",
+      description: "",
+      curriculum_reference: "",
+      cost: 0,
+      transfer_cost: 0,
+      sga_approved: false,
+      starting_date: "",
+      ending_date: "",
+    };
+    Object.assign(activity.value, newActivity);
+    router.push({ name: "Activities" });
   } catch (error) {
-    console.error('Error adding activity:', error);
+    console.error("Error adding activity:", error);
   }
 };
 </script>
