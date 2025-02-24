@@ -33,6 +33,7 @@ class Create(BaseModel):
     start_time: datetime
     end_time: datetime
     sga_approved: bool
+    class_ids: List[str]
 
 class Update(BaseModel):
     location: Optional[str]
