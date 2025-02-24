@@ -37,10 +37,10 @@ class RolesCRUD:
             request_permission=role.request_permission,
             change_permission=role.change_permission
         )
-        return_role = self.db_session.add(db_role)
+        self.db_session.add(db_role)
         await self.db_session.commit()
-        return return_role
-    
+        return db_role
+
     async def update_role(self, role: roles_schema.Create):
         db_role = await self.get_role_by_name(role.name)
         db_role.approvement_permission = role.approvement_permission
@@ -48,8 +48,9 @@ class RolesCRUD:
         db_role.request_permission = role.request_permission
         db_role.change_permission = role.change_permission
         await self.db_session.commit()
+        await self.db_session.refresh(db_role)
         return db_role
-    
+
     async def delete_role(self, name: str):
         stmt = delete(Roles).where(Roles.name == name)
         await self.db_session.execute(stmt)

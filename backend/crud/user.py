@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import select, update, delete
+from sqlalchemy import select, update, delete, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 from fastapi.security import OAuth2PasswordBearer
@@ -67,21 +67,19 @@ class UserCRUD:
         return users
 
     async def create_user(self, user: user_schema.DB) -> user_schema.DB:
-        #if not await self.check_username(user.username):
-        #    return None
-        db_user = UserModels(
-            username=user.username,
-            name=user.name,
+        stmt = (
+            insert(UserModels)
+            .values(username=user.username, name=user.name)
         )
-        return_user = self.db_session.add(db_user)
+        stmt.execution_options(synchronize_session="fetch")
+        await self.db_session.execute(stmt)
         await self.db_session.commit()
-        return return_user
+        return user
 
     async def update_user_login(self, username: str):
         db_user = await self.get_user_by_username(username)
         db_user.last_login = datetime.now()
-        await self.db_session.refresh(db_user)
-        return db_user
+        await self.db_session.commit()
 
     async def update_birthday(self, username: str, birthday: datetime):
         stmt = (
