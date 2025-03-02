@@ -1,15 +1,18 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from crud.roles import RolesCRUD
 import schemas.roles as roles_schema
 from database.config import async_session
-from api import user, auth, test, roles
+from api import user, auth, test, roles, activities, classes, parent_infos
 from database.config import engine, database, Base
 from database.startup import initialize_database
 
 app = FastAPI()
 app.include_router(auth.router)
-app.include_router(user.router, prefix="/api")
+app.include_router(user.router)
+app.include_router(activities.router)
+app.include_router(classes.router)
+app.include_router(parent_infos.router)
 app.include_router(test.router)
 app.include_router(roles.router)
 

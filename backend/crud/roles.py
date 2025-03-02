@@ -19,7 +19,7 @@ class RolesCRUD:
     async def get_roles(self):
         stmt = select(Roles)
         result = await self.db_session.execute(stmt)
-        roles = result.scalars().all()
+        roles = result.unique().scalars().all()
         return roles
     
     async def get_role_by_name(self, name: str) -> roles_schema.DB:

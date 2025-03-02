@@ -7,6 +7,7 @@ from typing import List
 import schemas.roles as roles_schema
 
 router = APIRouter(prefix="/roles", tags=["roles"])
+router = APIRouter(prefix="/roles", tags=["roles"])
 
 @router.get("/roles", response_model=List[roles_schema.DB], status_code=200)
 async def get_roles(token:str, db: RolesCRUD = Depends(get_roles_crud), user_db: UserCRUD = Depends(get_user_crud)):
