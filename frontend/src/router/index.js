@@ -1,16 +1,20 @@
-import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router';
-import HomeView from '../views/HomeView.vue';
-import DashboardView from '../views/DashboardView.vue';
-import LoginView from '../views/LoginView.vue';
-import UserManagementView from '../views/UserManagementView.vue';
-import LogoutView from '../views/LogoutView.vue';
-import NewActivity from '../views/NewActivity.vue';
-import RefreshView from '../views/RefreshView.vue';
-import ActivityView from '../views/ActivityView.vue';
-import { useAuthStore } from '../store/auth';
-import RegisterView from '../views/RegisterView.vue';
-import ClassManagement from '../views/management/ClassManagement.vue';
-import UserManagement from '../views/management/UserManagement.vue';
+import {
+  createRouter,
+  createWebHashHistory,
+  createWebHistory,
+} from "vue-router";
+import HomeView from "../views/HomeView.vue";
+import DashboardView from "../views/DashboardView.vue";
+import LoginView from "../views/LoginView.vue";
+import UserManagementView from "../views/UserManagementView.vue";
+import LogoutView from "../views/LogoutView.vue";
+import NewActivity from "../views/NewActivity.vue";
+import RefreshView from "../views/RefreshView.vue";
+import ActivityView from "../views/ActivityView.vue";
+import { useAuthStore } from "../store/auth";
+import RegisterView from "../views/RegisterView.vue";
+import ClassManagement from "../views/management/ClassManagement.vue";
+import UserManagement from "../views/management/UserManagement.vue";
 
 const routes = [
   {
@@ -85,19 +89,18 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const auth = useAuthStore();
+
+  auth.refresh();
   if (to.matched.some((record) => record.meta.requiresAuth)) {
-    if (
-      to.path.includes("/user_manage") &&
-      auth.super_user_permission !== true
-    ) {
+    if (to.path.includes("/user_manage") && !auth.isSuperUser) {
       next("/dashboard");
     }
-    
+
     if (auth.isAuthenticated) {
       next();
       return;
     }
-    next('/login');
+    next("/login");
   } else {
     next();
   }

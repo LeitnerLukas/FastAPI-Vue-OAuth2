@@ -19,9 +19,8 @@ export const useAuthStore = defineStore("auth", () => {
 
   const isAuthenticated = computed(() => access_token.value);
   const get_access_token = computed(() => access_token.value);
-  const get_super_user_permission = computed(
-    () => super_user_permission.value
-  );
+  const get_super_user_permission = computed(() => super_user_permission.value);
+  const isSuperUser = computed(() => super_user_permission.value);
 
   async function login(form) {
     access_token.value = null;
@@ -72,6 +71,9 @@ export const useAuthStore = defineStore("auth", () => {
       .then((res) => {
         access_token.value = res.data.access_token;
         super_user_permission.value = true;
+        localStorage.setItem("token", res.data.access_token);
+        localStorage.setItem("superuser", true);
+
         dialogStore.setSuccess({
           title: "Login Success",
           firstLine: "You can login now",
@@ -106,6 +108,8 @@ export const useAuthStore = defineStore("auth", () => {
   function logout() {
     apiLogout().then((res) => {
       access_token.value = null;
+      localStorage.removeItem("token");
+      localStorage.removeItem("superuser");
 
       dialogStore.setSuccess({
         title: "Logout Success",
@@ -123,67 +127,19 @@ export const useAuthStore = defineStore("auth", () => {
   function refresh() {
     loadingStore.setLoading();
 
-    apiRefresh()
-      .then((res) => {
-        access_token.value = res.data.access_token;
-        super_user_permission.value = res.data.super_user_permission;
+    access_token.value = localStorage.getItem("token");
+    super_user_permission.value = localStorage.getItem("superuser");
 
-        dialogStore.setSuccess({
-          title: "Refresh Success",
-          firstLine: "Redirecting to profile page",
-          secondLine: "This dialog will close in 1 seconds",
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-        access_token.value = null;
-        super_user_permission.value = null;
-
-        dialogStore.setError({
-          title: "Refresh Failed",
-          firstLine: "Please login again",
-          secondLine: "This dialog will close in 1 seconds",
-        });
-      })
-      .finally(() => {
-        setTimeout(() => {
-          if (isAuthenticated.value) {
-            router.push("/dashboard");
-            console.log("pushed to profile");
-          } else {
-            router.push("/login");
-            console.log("pushed to login");
-          }
-
-          dialogStore.reset();
-          loadingStore.clearLoading();
-        }, 1000);
-      });
+    loadingStore.clearLoading();
   }
 
   function refreshForLogin() {
     loadingStore.setLoading();
 
-    apiRefresh()
-      .then((res) => {
-        access_token.value = res.data.access_token;
-        super_user_permission.value = res.data.super_user_permission;
-      })
-      .catch((err) => {
-        console.log(err);
-        access_token.value = null;
-      })
-      .finally(() => {
-        if (isAuthenticated.value) {
-          router.push("/dashboard");
-          console.log("pushed to profile");
-        } else {
-          router.push("/login");
-          console.log("pushed to login");
-        }
+    access_token.value = localStorage.getItem("token");
+    super_user_permission.value = localStorage.getItem("superuser");
 
-        loadingStore.clearLoading();
-      });
+    loadingStore.clearLoading();
   }
 
   return {
@@ -191,6 +147,7 @@ export const useAuthStore = defineStore("auth", () => {
     get_super_user_permission,
     access_token,
     isAuthenticated,
+    isSuperUser,
     super_user_permission,
     login,
     logout,

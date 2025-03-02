@@ -29,7 +29,7 @@
                 >Dashboard</router-link
               >
             </li>
-            <li class="nav-item" v-if="auth.isAuthenticated && auth.super_user_permission === true">
+            <li class="nav-item" v-if="auth.isAuthenticated && auth.isSuperUser">
               <router-link class="nav-link" to="/user_manage"
                 >Manage Users</router-link
               >
