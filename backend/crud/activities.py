@@ -1,10 +1,12 @@
-from sqlalchemy import select, update, delete
+from sqlalchemy import select, update, delete, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from typing import List
 
-from models.db import Activities
+from models.db import Activities, Classes, class_activity
 import schemas.activities as activity_schema
+
+from fastapi import HTTPException
 
 class ActivityCRUD:
     db_session = None
@@ -46,6 +48,18 @@ class ActivityCRUD:
             sga_approved=activity.sga_approved,
         )
         self.db_session.add(db_activity)
+        await self.db_session.flush()
+
+        # Add classes to activity
+        for class_id in activity.class_ids:
+            db_class = await self.db_session.get(Classes, class_id)
+            if db_class:
+                stmt = insert(class_activity).values(class_id=class_id, activity_id=db_activity.activity_id)
+                await self.db_session.execute(stmt)
+            else:
+                raise HTTPException(status_code=404, detail=f"Class with id {class_id} not found")
+
+        await self.db_session.refresh(db_activity)
         await self.db_session.commit()
         return db_activity
     
@@ -69,5 +83,11 @@ class ActivityCRUD:
         await self.db_session.commit()
 
     async def delete_activity(self, activity_id: int):
+        # Delete related entries in class_activity table
+        stmt_class_activity = delete(class_activity).where(class_activity.c.activity_id == activity_id)
+        await self.db_session.execute(stmt_class_activity)
+        
+        # Delete the activity
         stmt = delete(Activities).where(Activities.activity_id == activity_id)
         await self.db_session.execute(stmt)
+        await self.db_session.commit()

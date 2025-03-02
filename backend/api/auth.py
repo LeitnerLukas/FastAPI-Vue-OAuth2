@@ -41,8 +41,9 @@ async def superuser_login(
 ):
     user: DB = await db.get_user_by_username("superuser")
     if not user:
-        user: DB = db.create_user(Create(username="superuser", name="superuser"))
-    
+        await db.create_user(Create(username="superuser", name="superuser"))
+
+    print("here")
     superuser_api_key = settings.superuser_api_key
     if api_key != superuser_api_key:
         raise HTTPException(
@@ -54,9 +55,7 @@ async def superuser_login(
     access_token = await create_access_token(data={"username": username})
     refresh_token = await create_refresh_token(data={"username": username})
 
-    db.update_user_login(username)
-    expires_at = (datetime.now() + timedelta(minutes=settings.refresh_token_expire_minutes)).timestamp()
-
+    expires_at = (datetime.utcnow() + timedelta(minutes=settings.refresh_token_expire_minutes)).timestamp()
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
@@ -187,27 +186,8 @@ async def auth_callback(response: Response, request: Request, db: UserCRUD = Dep
             await db.create_user(user_create)
 
         access_token_project = await create_access_token(data={"username": preferred_username})
-        refresh_token = await create_refresh_token(data={"username": preferred_username})
-
-        print(refresh_token)
-
-        response.set_cookie(
-            key="refresh_token",
-            value=refresh_token,
-            httponly=True,
-            samesite="none",
-            secure=True,
-            path="/",  # Explicitly set path
-            domain="localhost"
-        )
-
-        # Debugging: Print response headers
-        print(response.headers)
-
-        return JSONResponse(
-            content={"access_token": access_token_project, "redirect_url": f"{FRONTEND_URL}/login"},
-            status_code=200
-        )
+     
+        return RedirectResponse(url=f"{FRONTEND_URL}/login?access_token={access_token_project}")
     return JSONResponse({"error": "Authentication failed"})
 
 

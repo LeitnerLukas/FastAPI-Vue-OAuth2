@@ -10,6 +10,7 @@ class DB(BaseModel):
     name: str
     create_time: datetime
     last_login: datetime
+    roles: list[str] = []
 
 class Create(BaseModel):
     username: str
