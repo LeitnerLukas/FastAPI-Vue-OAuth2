@@ -15,7 +15,19 @@ async def get_users(token:str, db: UserCRUD = Depends(get_user_crud), roles_db: 
     current = await db.get_current_user(token)
     if not current.username:
         raise HTTPException(status_code=403, detail="Forbidden")
-    return await db.get_users()
+    users = await db.get_users()
+    return_users = []
+    for user in users:
+        roles = await roles_db.get_roles_by_user(user.username)
+        db_user = user_schema.DB(
+            username=user.username,
+            name=user.name,
+            create_time=user.create_time,
+            last_login=user.last_login,
+            roles=[role.name for role in roles]
+        )
+        return_users.append(db_user)
+    return return_users
 
 @router.get("/me")
 async def get_me(token:str, db: UserCRUD = Depends(get_user_crud)):
