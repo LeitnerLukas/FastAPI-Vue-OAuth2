@@ -86,12 +86,12 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const auth = useAuthStore();
   if (to.matched.some((record) => record.meta.requiresAuth)) {
-    // if (
-    //   to.path.includes("/user_manage") &&
-    //   auth.super_approvement_permission !== true
-    // ) {
-    //   next("/dashboard");
-    // }
+    if (
+      to.path.includes("/user_manage") &&
+      auth.super_user_permission !== true
+    ) {
+      next("/dashboard");
+    }
     
     if (auth.isAuthenticated) {
       next();

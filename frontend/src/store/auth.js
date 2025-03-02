@@ -12,42 +12,26 @@ import router from "../router";
 
 export const useAuthStore = defineStore("auth", () => {
   const access_token = ref(null);
-  const approvement_permission = ref(null);
-  const super_approvement_permission = ref(null);
-  const request_permission = ref(null);
-  const change_permission = ref(null);
+  const super_user_permission = ref(null);
 
   const loadingStore = useLoadingStore();
   const dialogStore = useDialogStore();
 
   const isAuthenticated = computed(() => access_token.value);
   const get_access_token = computed(() => access_token.value);
-  const get_approvement_permission = computed(
-    () => approvement_permission.value
+  const get_super_user_permission = computed(
+    () => super_user_permission.value
   );
-  const get_super_approvement_permission = computed(
-    () => super_approvement_permission.value
-  );
-  const get_request_permission = computed(() => request_permission.value);
-  const get_change_permission = computed(() => change_permission.value);
 
   async function login(form) {
     access_token.value = null;
-    approvement_permission.value = null;
-    super_approvement_permission.value = null;
-    request_permission.value = null;
-    change_permission.value = null;
+    super_user_permission.value = null;
 
     loadingStore.setLoading();
 
     apiLogin(form)
       .then((res) => {
         access_token.value = res.data.access_token;
-        approvement_permission.value = res.data.role.approvement_permission;
-        super_approvement_permission.value =
-          res.data.role.super_approvement_permission;
-        request_permission.value = res.data.role.request_permission;
-        change_permission.value = res.data.role.change_permission;
 
         dialogStore.setSuccess({
           title: "Login Success",
@@ -62,10 +46,6 @@ export const useAuthStore = defineStore("auth", () => {
           secondLine: "This dialog will close in 1 seconds",
         });
         access_token.value = null;
-        approvement_permission.value = null;
-        super_approvement_permission.value = null;
-        request_permission.value = null;
-        change_permission.value = null;
       })
       .finally(() => {
         loadingStore.clearLoading();
@@ -85,20 +65,14 @@ export const useAuthStore = defineStore("auth", () => {
 
   async function superuserLogin(form) {
     access_token.value = null;
-    approvement_permission.value = null;
-    super_approvement_permission.value = null;
-    request_permission.value = null;
-    change_permission.value = null;
+    super_user_permission.value = null;
 
     loadingStore.setLoading();
 
     await apiLoginSuperuser(form)
       .then((res) => {
         access_token.value = res.data.access_token;
-        approvement_permission.value = true;
-        super_approvement_permission.value = true;
-        request_permission.value = true;
-        change_permission.value = true;
+        super_user_permission.value = true;
 
         dialogStore.setSuccess({
           title: "Login Success",
@@ -113,10 +87,7 @@ export const useAuthStore = defineStore("auth", () => {
           secondLine: "This dialog will close in 1 seconds",
         });
         access_token.value = null;
-        approvement_permission.value = null;
-        super_approvement_permission.value = null;
-        request_permission.value = null;
-        change_permission.value = null;
+        super_user_permission.value = null;
       })
       .finally(() => {
         loadingStore.clearLoading();
@@ -137,10 +108,6 @@ export const useAuthStore = defineStore("auth", () => {
   function logout() {
     apiLogout().then((res) => {
       access_token.value = null;
-      approvement_permission.value = null;
-      super_approvement_permission.value = null;
-      request_permission.value = null;
-      change_permission.value = null;
 
       dialogStore.setSuccess({
         title: "Logout Success",
@@ -161,11 +128,7 @@ export const useAuthStore = defineStore("auth", () => {
     apiRefresh()
       .then((res) => {
         access_token.value = res.data.access_token;
-        approvement_permission.value = res.data.role.approvement_permission;
-        super_approvement_permission.value =
-          res.data.role.super_approvement_permission;
-        request_permission.value = res.data.role.request_permission;
-        change_permission.value = res.data.role.change_permission;
+        super_user_permission.value = res.data.super_user_permission;
 
         dialogStore.setSuccess({
           title: "Refresh Success",
@@ -176,10 +139,7 @@ export const useAuthStore = defineStore("auth", () => {
       .catch((err) => {
         console.log(err);
         access_token.value = null;
-        approvement_permission.value = null;
-        super_approvement_permission.value = null;
-        request_permission.value = null;
-        change_permission.value = null;
+        super_user_permission.value = null;
 
         dialogStore.setError({
           title: "Refresh Failed",
@@ -209,10 +169,7 @@ export const useAuthStore = defineStore("auth", () => {
     apiRefresh()
       .then((res) => {
         access_token.value = res.data.access_token;
-        approvement_permission.value = null;
-        super_approvement_permission.value = null;
-        request_permission.value = null;
-        change_permission.value = null;
+        super_user_permission.value = res.data.super_user_permission;
       })
       .catch((err) => {
         console.log(err);
@@ -233,10 +190,7 @@ export const useAuthStore = defineStore("auth", () => {
 
   return {
     get_access_token,
-    get_approvement_permission,
-    get_super_approvement_permission,
-    get_request_permission,
-    get_change_permission,
+    get_super_user_permission,
     access_token,
     isAuthenticated,
     approvement_permission,

@@ -120,9 +120,9 @@
             <td>
               <div
                 v-if="user.roles"
-                @click="removeUserRole(user.id, role.id)"
+                @click="removeUserRole(user.id, role.name)"
                 v-for="role in user.roles"
-                :key="role.id"
+                :key="role.name"
               >
                 <span style="color: red; cursor: pointer">x</span>
                 {{ role.name }}
@@ -133,11 +133,11 @@
                 v-if="user.roles"
                 v-for="role in roles.filter(
                   (role) =>
-                    !user.roles.some((userRole) => userRole.id === role.id)
+                    !user.roles.some((userRole) => userRole.name === role.name)
                 )"
-                :key="role.id"
+                :key="role.name"
               >
-                <div @click="addUserRole(user.id, role.id)">
+                <div @click="addUserRole(user.id, role.name)">
                   <span style="color: green; cursor: pointer">+</span>
                   {{ role.name }}
                 </div>
