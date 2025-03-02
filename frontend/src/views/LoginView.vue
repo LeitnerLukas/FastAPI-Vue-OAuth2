@@ -38,7 +38,8 @@ const form = ref({
 
 const auth = useAuthStore();
 
-const submit = async () => {
+const submit = async (event) => {
+  event.preventDefault();
   await auth.superuserLogin(form.value.api_key);
 };
 

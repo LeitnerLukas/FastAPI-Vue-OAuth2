@@ -120,12 +120,12 @@
             <td>
               <div
                 v-if="user.roles"
-                @click="removeUserRole(user.id, role.name)"
+                @click="removeUserRole(user.username, role)"
                 v-for="role in user.roles"
-                :key="role.name"
+                :key="role"
               >
                 <span style="color: red; cursor: pointer">x</span>
-                {{ role.name }}
+                {{ role }}
               </div>
             </td>
             <td>
@@ -133,18 +133,18 @@
                 v-if="user.roles"
                 v-for="role in roles.filter(
                   (role) =>
-                    !user.roles.some((userRole) => userRole.name === role.name)
+                    !user.roles.some((userRole) => userRole === role.name)
                 )"
                 :key="role.name"
               >
-                <div @click="addUserRole(user.id, role.name)">
+                <div @click="addUserRole(user.username, role.name)">
                   <span style="color: green; cursor: pointer">+</span>
                   {{ role.name }}
                 </div>
               </div>
             </td>
             <td>
-              <button class="btn btn-danger" @click="removeUser(user.id)">
+              <button class="btn btn-danger" @click="removeUser(user.username)">
                 Remove
               </button>
             </td>
@@ -157,10 +157,13 @@
 
 <script setup>
 import { onMounted, ref } from "vue";
-import { deleteUser, updateUserRole } from "../../api/superuser";
+import { deleteUser } from "../../api/superuser";
 import { getUsers } from "../../api/user";
-import { createRole, deleteUserRole, getRoles } from "../../api/roles";
+import { createRole, deleteUserRole, getRoles, updateUserRole } from "../../api/roles";
 import { useDialogStore } from "../../store/dialog";
+import { useAuthStore } from '../../store/auth';
+
+const auth = useAuthStore();
 
 const roleData = ref({
   name: "",
@@ -176,18 +179,18 @@ const users = ref([]);
 const dialogStore = useDialogStore();
 
 const fetchRoles = async () => {
-  const fetchedRoles = await getRoles();
+  const fetchedRoles = await getRoles(auth.access_token);
   roles.value = fetchedRoles.data;
 };
 
 const fetchUsers = async () => {
-  const fetchedUsers = await getUsers();
+  const fetchedUsers = await getUsers(auth.access_token);
   users.value = fetchedUsers.data;
 };
 
 const submitRole = async () => {
   try {
-    await createRole(roleData.value);
+    await createRole(roleData.value, auth.access_token);
     roles.value.push(roleData.value);
   } catch (error) {
     dialogStore.setError({
@@ -201,16 +204,16 @@ const submitRole = async () => {
   }
 };
 
-const addUserRole = async (userId, roleId) => {
+const addUserRole = async (userdata, roledata) => {
   try {
-    await updateUserRole(userId, roleId);
-    const user = users.value.find((user) => user.id === userId);
-    const role = roles.value.find((role) => role.id === roleId);
+    await updateUserRole(userdata, roledata, auth.access_token);
+    const user = users.value.find((user) => user.username === userdata);
+    const role = roles.value.find((role) => role.name === roledata);
 
     if (user && role) {
-      const hasRole = user.roles.some((userRole) => userRole.id === roleId);
+      const hasRole = user.roles.some((userRole) => userRole.name === roledata);
       if (!hasRole) {
-        user.roles.push(role);
+        user.roles.push(role.name);
       }
     }
   } catch (error) {
@@ -225,10 +228,10 @@ const addUserRole = async (userId, roleId) => {
   }
 };
 
-const removeUser = async (userId) => {
+const removeUser = async (username) => {
   try {
-    await deleteUser(userId);
-    users.value = users.value.filter((user) => user.id !== userId);
+    await deleteUser(username, auth.access_token);
+    users.value = users.value.filter((user) => user.username !== username);
   } catch (error) {
     dialogStore.setError({
       title: "Error removing user",
@@ -241,14 +244,14 @@ const removeUser = async (userId) => {
   }
 };
 
-const removeUserRole = async (userId, roleId) => {
+const removeUserRole = async (userdata, roledata) => {
   try {
-    await deleteUserRole(userId, roleId);
-    const userIndex = users.value.findIndex((user) => user.id === userId);
+    await deleteUserRole(userdata, roledata, auth.access_token);
+    const userIndex = users.value.findIndex((user) => user.username === userdata);
 
     if (userIndex !== -1) {
       users.value[userIndex].roles = users.value[userIndex].roles.filter(
-        (role) => role.id !== roleId
+        (role) => role !== roledata
       );
     }
   } catch (error) {

@@ -35,6 +35,6 @@ import axios from "axios";
 //     },
 //   ]);
 // };
-export const getUsers = () => request('GET', '/users');
-export const apiRegister = (data) => axios.post("/users", data);
-export const apiGetUserList = () => axios.get("/users");
+export const getUsers = (token) => request("GET", `/users?token=${token}`);
+export const apiRegister = (data) => axios.post(`/users`, data);
+export const apiGetUserList = () => axios.get(`/users`);

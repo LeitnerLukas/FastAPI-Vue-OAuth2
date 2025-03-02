@@ -66,14 +66,12 @@ export const useAuthStore = defineStore("auth", () => {
   async function superuserLogin(form) {
     access_token.value = null;
     super_user_permission.value = null;
-
     loadingStore.setLoading();
 
     await apiLoginSuperuser(form)
       .then((res) => {
         access_token.value = res.data.access_token;
         super_user_permission.value = true;
-
         dialogStore.setSuccess({
           title: "Login Success",
           firstLine: "You can login now",
@@ -193,10 +191,7 @@ export const useAuthStore = defineStore("auth", () => {
     get_super_user_permission,
     access_token,
     isAuthenticated,
-    approvement_permission,
-    super_approvement_permission: true,
-    request_permission,
-    change_permission,
+    super_user_permission,
     login,
     logout,
     refresh,

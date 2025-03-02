@@ -109,6 +109,10 @@ import {
 } from "../../api/class";
 import { useDialogStore } from "../../store/dialog";
 
+import { useAuthStore } from '../../store/auth';
+
+const auth = useAuthStore();
+
 const classData = ref({
   id: "",
   girls: 0,
@@ -120,7 +124,7 @@ const classes = ref([]);
 const dialogStore = useDialogStore();
 
 const fetchClasses = async () => {
-  const fetchedClass = await getClasses();
+  const fetchedClass = await getClasses(auth.access_token);
   classes.value = fetchedClass.data;
 };
 
@@ -130,7 +134,7 @@ const submitClass = async (newClass) => {
       class_id: newClass.id,
       girl_count: newClass.girls,
       boy_count: newClass.boys,
-    });
+    }, auth.access_token);
     classes.value.push({
       class_id: newClass.id,
       girl_count: newClass.girls,
@@ -150,7 +154,7 @@ const submitClass = async (newClass) => {
 
 const removeClass = async (classId) => {
   try {
-    await deleteClass(classId);
+    await deleteClass(classId, auth.access_token);
     classes.value = classes.value.filter(
       (schoolClass) => schoolClass.class_id !== classId
     );
@@ -177,7 +181,7 @@ const updateClassData = async (classId, girls, boys) => {
       await updateClass(classId, {
         girl_count: parseInt(girls),
         boy_count: parseInt(boys),
-      });
+      }, auth.access_token);
     }
   } catch (error) {
     dialogStore.setError({
