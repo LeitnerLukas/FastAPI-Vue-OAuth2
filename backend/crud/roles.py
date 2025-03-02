@@ -8,8 +8,7 @@ from fastapi import Depends, status, HTTPException
 
 from models.db import Roles
 import schemas.roles as roles_schema
-
-from os import getenv
+from models.db import user_role
 
 class RolesCRUD:
     db_session = None
@@ -29,6 +28,12 @@ class RolesCRUD:
         role = result.scalars().first()
         return role
     
+    async def get_roles_by_user(self, username: str):
+        stmt = select(Roles).join(user_role, Roles.name == user_role.c.role_name).where(user_role.c.username == username)
+        result = await self.db_session.execute(stmt)
+        roles = result.scalars().all()
+        return roles
+
     async def create_role(self, role: roles_schema.Create):
         db_role = Roles(
             name=role.name,
@@ -40,7 +45,41 @@ class RolesCRUD:
         self.db_session.add(db_role)
         await self.db_session.commit()
         return db_role
+    
+    async def get_approvement_permission(self, username: str):
+        stmt = select(Roles).join(user_role, Roles.name == user_role.c.role_name).where(user_role.c.username == username, Roles.approvement_permission == True)
+        result = await self.db_session.execute(stmt)
+        role = result.scalars().first()
+        return role is not None
+    
+    async def get_super_approvement_permission(self, username: str):
+        stmt = select(Roles).join(user_role, Roles.name == user_role.c.role_name).where(user_role.c.username == username, Roles.super_approvement_permission == True)
+        result = await self.db_session.execute(stmt)
+        role = result.scalars().first()
+        return role is not None
+    
+    async def get_request_permission(self, username: str):
+        stmt = select(Roles).join(user_role, Roles.name == user_role.c.role_name).where(user_role.c.username == username, Roles.request_permission == True)
+        result = await self.db_session.execute(stmt)
+        role = result.scalars().first()
+        return role is not None
+    
+    async def get_change_permission(self, username: str):
+        stmt = select(Roles).join(user_role, Roles.name == user_role.c.role_name).where(user_role.c.username == username, Roles.change_permission == True)
+        result = await self.db_session.execute(stmt)
+        role = result.scalars().first()
+        return role is not None
+    
+    async def give_user_role(self, role: str, username: str):
+        stmt = user_role.insert().values(username=username, role_name=role)
+        await self.db_session.execute(stmt)
+        await self.db_session.commit()
 
+    async def remove_user_role(self, role: str, username: str):
+        stmt = delete(user_role).where(user_role.c.username == username, user_role.c.role_name == role)
+        await self.db_session.execute(stmt)
+        await self.db_session.commit()
+    
     async def update_role(self, role: roles_schema.Create):
         db_role = await self.get_role_by_name(role.name)
         db_role.approvement_permission = role.approvement_permission

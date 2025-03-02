@@ -7,6 +7,7 @@ from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends, status, HTTPException
 from jose import JWTError, jwt
 from schemas.token import TokenData
+from models.db import user_role
 
 from auth.utils import get_password_hash
 from models.db import UserModels
@@ -41,8 +42,8 @@ class UserCRUD:
     )
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-            print(payload)
-            username: str = payload.get("sub")
+    
+            username: str = payload["username"]
             if username is None:
                 raise credentials_exception
             token_data = TokenData(username=username)
@@ -51,8 +52,7 @@ class UserCRUD:
         user: user_schema.DB = await self.get_user_by_username(username=token_data.username)
         if user is None:
             raise credentials_exception
-        print({"username": user.username})
-        return {"username": user.username}
+        return user
     
     async def get_user_by_username(self, username: str) -> user_schema.DB:
         stmt = select(UserModels).where(UserModels.username == username)
@@ -67,12 +67,25 @@ class UserCRUD:
         return users
 
     async def create_user(self, user: user_schema.DB) -> user_schema.DB:
+        #check = await self.check_username(user.username)
+        #if not check:
+            #raise HTTPException(
+                #status_code=400,
+                #detail="Invalid domain"
+            #)
         stmt = (
             insert(UserModels)
             .values(username=user.username, name=user.name)
         )
+        stmt2 = None
+        if user.username == "superuser":
+            stmt2 = insert(user_role).values(username=user.username, role_name="superuser")
+        else:   
+            stmt2 = insert(user_role).values(username=user.username, role_name="teacher")
         stmt.execution_options(synchronize_session="fetch")
+        stmt2.execution_options(synchronize_session="fetch")
         await self.db_session.execute(stmt)
+        await self.db_session.execute(stmt2)
         await self.db_session.commit()
         return user
 
