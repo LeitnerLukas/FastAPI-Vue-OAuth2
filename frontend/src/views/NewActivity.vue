@@ -1,3 +1,71 @@
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { createActivity } from '../api/activities';
+import { getClasses } from '../api/classes';
+import { useAuth } from '../composables/useAuth';
+
+const router = useRouter();
+const { auth } = useAuth();
+
+const activity = ref({
+  location: '',
+  description: '',
+  curriculum_reference: '',
+  cost: 0,
+  transfer_cost: 0,
+  sga_approved: false,
+  starting_date: '',
+  ending_date: '',
+  class_id: null,
+});
+
+const classes = ref([]);
+
+const fetchClasses = async () => {
+  try {
+    const response = await getClasses(auth.token);
+    classes.value = response.data; // Ensure response.data contains the array of classes
+  } catch (error) {
+    console.error('Error fetching classes:', error);
+  }
+};
+
+const addActivity = async () => {
+  if (activity.value.starting_date >= activity.value.ending_date) {
+    alert('Starting date must be before the ending date.');
+    return;
+  }
+
+  try {
+    await createActivity(
+      {
+        ...activity.value,
+        class_id: activity.value.class_id,
+      },
+      auth.token
+    );
+    // Reset the form
+    Object.assign(activity.value, {
+      location: '',
+      description: '',
+      curriculum_reference: '',
+      cost: 0,
+      transfer_cost: 0,
+      sga_approved: false,
+      starting_date: '',
+      ending_date: '',
+      class_id: null,
+    });
+    router.push({ name: 'Activities' });
+  } catch (error) {
+    console.error('Error adding activity:', error);
+  }
+};
+
+onMounted(fetchClasses);
+</script>
+
 <template>
   <div class="container mt-5">
     <div class="row justify-content-center">
@@ -6,6 +74,24 @@
           <div class="card-body">
             <h2 class="card-title mb-4">Add New Activity</h2>
             <form @submit.prevent="addActivity">
+              <div class="mb-3">
+                <label for="class_id" class="form-label">Class</label>
+                <select
+                  v-model="activity.class_id"
+                  id="class_id"
+                  class="form-select"
+                  required
+                >
+                  <option
+                    v-for="classItem in classes"
+                    :key="classItem.id"
+                    :value="classItem.id"
+                  >
+                    {{ classItem.name }}
+                  </option>
+                </select>
+              </div>
+
               <div class="mb-3">
                 <label for="location" class="form-label">Location</label>
                 <input
@@ -112,49 +198,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { createActivity } from '../api/activities';
-import { useAuth } from '../composables/useAuth'; // Assuming you have a composable to access auth
-
-const router = useRouter();
-const auth = useAuthStore();
-
-const activity = ref({
-  location: '',
-  description: '',
-  curriculum_reference: '',
-  cost: 0,
-  transfer_cost: 0,
-  sga_approved: false,
-  starting_date: '',
-  ending_date: '',
-});
-
-const addActivity = async () => {
-  if (activity.value.starting_date >= activity.value.ending_date) {
-    alert('Starting date must be before the ending date.');
-    return;
-  }
-
-  try {
-    await createActivity(activity.value, auth.token); // Pass the token to the API call
-    // Reset the form
-    Object.assign(activity.value, {
-      location: '',
-      description: '',
-      curriculum_reference: '',
-      cost: 0,
-      transfer_cost: 0,
-      sga_approved: false,
-      starting_date: '',
-      ending_date: '',
-    });
-    router.push({ name: 'Activities' });
-  } catch (error) {
-    console.error('Error adding activity:', error);
-  }
-};
-</script>
