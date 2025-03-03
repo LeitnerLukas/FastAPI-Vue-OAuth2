@@ -20,6 +20,7 @@ class Base(BaseModel):
     users: List[user_schema.DB]
     classes: List[class_schema.Base]
     parent_infos: List[parent_info_schema.Base]
+    state: str
 
     class Config:
         orm_mode = True
@@ -34,6 +35,7 @@ class Create(BaseModel):
     end_time: datetime
     sga_approved: bool
     class_ids: List[str]
+    state: str = "requested"
 
 class Update(BaseModel):
     location: Optional[str]
@@ -45,3 +47,4 @@ class Update(BaseModel):
     end_time: Optional[datetime]
     last_update: Optional[datetime] = datetime.now()
     sga_approved: bool
+    state: str

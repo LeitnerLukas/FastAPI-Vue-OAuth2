@@ -1,80 +1,88 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from models import Activity, Note
-from database import get_db
-from schemas import NoteCreate
+from models.db import Activities
+from crud.activities import ActivityCRUD
+from crud.user import UserCRUD
+from crud.roles import RolesCRUD
+from crud.dependencies import get_activities_crud, get_user_crud, get_roles_crud
 from crud.types import AcceptState
+from schemas.activities import Base
 
-app = FastAPI()
+router = APIRouter(prefix="/approve", tags=["approve"])
 
-@app.post("/activities/{activity_id}/submit_for_approval")
-def submit_for_approval(activity_id: int, db: Session = Depends(get_db)):
-    activity = db.query(Activity).filter(Activity.id == activity_id).first()
+
+@router.post("/activities/{activity_id}/approve")
+async def approve_activity(token:str, activity_id: int, activity_db: ActivityCRUD = Depends(get_activities_crud), user_db: UserCRUD = Depends(get_user_crud), roles_db: RolesCRUD = Depends(get_roles_crud)):
+    current = await user_db.get_current_user(token)
+    if not current.username:
+        raise HTTPException(
+            status_code=403,
+            detail="Forbidden"
+        )
+    check_permission = await roles_db.get_approvement_permission(current.username)
+    if not check_permission:
+        raise HTTPException(
+            status_code=403,
+            detail="Forbidden, no permission."
+        )
+    activity: Base  = await activity_db.get_activity_by_id(activity_id)
+    print(activity.state)
     if activity is None:
         raise HTTPException(status_code=404, detail="Activity not found")
     
-    if activity.state != AcceptState.REQUESTED.value:
-        activity.state = AcceptState.REQUESTED.value  
-        db.commit()
-        db.refresh(activity)
-        return {"message": "Activity submitted for approval", "activity": activity}
-    
-    raise HTTPException(status_code=400, detail="Activity is already waiting for approval")
-
-
-@app.post("/activities/{activity_id}/approve")
-def approve_activity(activity_id: int, db: Session = Depends(get_db)):
-    activity = db.query(Activity).filter(Activity.id == activity_id).first()
-    if activity is None:
-        raise HTTPException(status_code=404, detail="Activity not found")
-    
-    if activity.state != AcceptState.REQUESTED.value:
+    if activity.state != AcceptState.REQUESTED:
         raise HTTPException(status_code=400, detail="Activity must be in 'requested' state to approve")
     
-    activity.state = AcceptState.APPROVED.value  
-    db.commit()
-    db.refresh(activity)
+    activity.state = AcceptState.APPROVED
+    await activity_db.update_activity(activity_id=activity_id, activity=activity)
     return {"message": "Activity approved", "activity": activity}
 
 
-@app.post("/activities/{activity_id}/super_approve")
-def super_approve_activity(activity_id: int, db: Session = Depends(get_db)):
-    activity = db.query(Activity).filter(Activity.id == activity_id).first()
+@router.post("/activities/{activity_id}/super_approve")
+async def super_approve_activity(token:str, activity_id: int, activity_db: ActivityCRUD = Depends(get_activities_crud), user_db: UserCRUD = Depends(get_user_crud), roles_db: RolesCRUD = Depends(get_roles_crud)):
+    current = await user_db.get_current_user(token)
+    if not current.username:
+        raise HTTPException(
+            status_code=403,
+            detail="Forbidden"
+        )
+    check_permission = await roles_db.get_super_approvement_permission(current.username)
+    if not check_permission:
+        raise HTTPException(
+            status_code=403,
+            detail="Forbidden, no permission."
+        )
+    activity: Base = await activity_db.get_activity_by_id(activity_id)
     if activity is None:
         raise HTTPException(status_code=404, detail="Activity not found")
-    
-    if activity.state != AcceptState.APPROVED.value:
+    print(activity.state)
+    if activity.state != AcceptState.APPROVED:
         raise HTTPException(status_code=400, detail="Activity must be 'approved' before super approval")
     
-    activity.state = AcceptState.SUPER_APPROVED.value  
-    db.commit()
-    db.refresh(activity)
+    activity.state = AcceptState.SUPER_APPROVED
+    await activity_db.update_activity(activity_id=activity_id, activity=activity)
     return {"message": "Activity super approved", "activity": activity}
 
 
-@app.post("/activities/{activity_id}/reject")
-def reject_activity(activity_id: int, db: Session = Depends(get_db)):
-    activity = db.query(Activity).filter(Activity.id == activity_id).first()
-    if activity is None:
-        raise HTTPException(status_code=404, detail="Activity not found")
+@router.post("/activities/{activity_id}/reject")
+async def reject_activity(token:str, activity_id: int, activity_db: ActivityCRUD = Depends(get_activities_crud), user_db: UserCRUD = Depends(get_user_crud), roles_db: RolesCRUD = Depends(get_roles_crud)):
+    current = await user_db.get_current_user(token)
+    if not current.username:
+        raise HTTPException(
+            status_code=403,
+            detail="Forbidden"
+        )
+    check_permission = await roles_db.get_approvement_permission(current.username)
+    if not check_permission:
+        raise HTTPException(
+            status_code=403,
+            detail="Forbidden, no permission."
+        )
     
-    if activity.state in [AcceptState.APPROVED.value, AcceptState.SUPER_APPROVED.value]:
-        raise HTTPException(status_code=400, detail="Approved activities cannot be rejected")
-
-    activity.state = AcceptState.DENIED.value  
-    db.commit()
-    db.refresh(activity)
-    return {"message": "Activity rejected", "activity": activity}
-
-
-@app.post("/activities/{activity_id}/notes")
-def create_note_for_activity(activity_id: int, note: NoteCreate, db: Session = Depends(get_db)):
-    activity = db.query(Activity).filter(Activity.id == activity_id).first()
+    activity: Base = await activity_db.get_activity_by_id(activity_id)
     if activity is None:
         raise HTTPException(status_code=404, detail="Activity not found")
 
-    db_note = Note(**note.dict(), activity_id=activity_id)
-    db.add(db_note)
-    db.commit()
-    db.refresh(db_note)
-    return db_note
+    activity.state = AcceptState.DENIED
+    await activity_db.update_activity(activity_id=activity_id, activity=activity)
+    return {"message": "Activity rejected", "activity": activity}

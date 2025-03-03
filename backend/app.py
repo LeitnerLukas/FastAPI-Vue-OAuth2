@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from crud.roles import RolesCRUD
 import schemas.roles as roles_schema
 from database.config import async_session
-from api import user, auth, test, roles, activities, classes, parent_infos
+from api import user, auth, test, roles, activities, classes, parent_infos, approve
 from database.config import engine, database, Base
 from database.startup import initialize_database
 
@@ -15,6 +15,7 @@ app.include_router(classes.router)
 app.include_router(parent_infos.router)
 app.include_router(test.router)
 app.include_router(roles.router)
+app.include_router(approve.router)
 
 methods = [
     "DELETE",
