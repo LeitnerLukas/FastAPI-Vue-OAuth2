@@ -3,10 +3,10 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { createActivity } from '../api/activities';
 import { getClasses } from '../api/classes';
-import { useAuth } from '../composables/useAuth';
+import { useAuthStore } from '../store/auth';
 
 const router = useRouter();
-const { auth } = useAuth();
+const auth = useAuthStore();
 
 const activity = ref({
   location: '',
@@ -24,7 +24,7 @@ const classes = ref([]);
 
 const fetchClasses = async () => {
   try {
-    const response = await getClasses(auth.token);
+    const response = await getClasses(auth.access_token);
     classes.value = response.data; // Ensure response.data contains the array of classes
   } catch (error) {
     console.error('Error fetching classes:', error);
