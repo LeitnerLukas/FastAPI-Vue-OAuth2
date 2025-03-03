@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { createActivity } from '../api/activities';
-import { getClasses } from '../api/classes';
+import { getClasses } from '../api/class';
 import { useAuthStore } from '../store/auth';
 
 const router = useRouter();
@@ -26,6 +26,7 @@ const fetchClasses = async () => {
   try {
     const response = await getClasses(auth.access_token);
     classes.value = response.data; // Ensure response.data contains the array of classes
+    console.log('Classes:', classes.value);
   } catch (error) {
     console.error('Error fetching classes:', error);
   }
@@ -43,7 +44,7 @@ const addActivity = async () => {
         ...activity.value,
         class_id: activity.value.class_id,
       },
-      auth.token
+      auth.access_token
     );
     // Reset the form
     Object.assign(activity.value, {
@@ -84,10 +85,10 @@ onMounted(fetchClasses);
                 >
                   <option
                     v-for="classItem in classes"
-                    :key="classItem.id"
-                    :value="classItem.id"
+                    :key="classItem.class_id"
+                    :value="classItem.class_id"
                   >
-                    {{ classItem.name }}
+                    {{ classItem.class_id }}
                   </option>
                 </select>
               </div>
