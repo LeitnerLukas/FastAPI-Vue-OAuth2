@@ -38,7 +38,8 @@ const form = ref({
 
 const auth = useAuthStore();
 
-const submit = async () => {
+const submit = async (event) => {
+  event.preventDefault();
   await auth.superuserLogin(form.value.api_key);
 };
 
@@ -46,6 +47,7 @@ onMounted(() => {
   const accessToken = route.query.access_token;
   if (accessToken) {
     auth.access_token = accessToken;
+    localStorage.setItem("token", accessToken);
     router.replace({ query: {} });
     if(auth.isAuthenticated) {
       router.push("/dashboard");

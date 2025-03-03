@@ -83,9 +83,9 @@ class Activities(Base):
     last_update = Column(DateTime, default=datetime.now())
 
     users = relationship("UserModels", secondary=user_activity, back_populates="activities")
-    classes = relationship("Classes", secondary=class_activity, back_populates="activities")
-    notes = relationship("Notes")
-    parent_infos = relationship("ParentInfos")
+    classes = relationship("Classes", secondary=class_activity, back_populates="activities", cascade="all, delete")
+    notes = relationship("Notes", cascade="all, delete")
+    parent_infos = relationship("ParentInfos", cascade="all, delete")
 
     def __repr__(self) -> str:
         return f"<Activities(location={self.location}, description={self.description}, curriculum_reference={self.curriculum_reference}, cost={self.cost}, transfer_cost={self.transfer_cost}, start_time={self.start_time}, end_time={self.end_time})>"
@@ -127,4 +127,4 @@ class ParentInfos(Base):
     def __init__(self, text: str, activity_id: int):
         self.text = text
         self.activity_id = activity_id
-    
+

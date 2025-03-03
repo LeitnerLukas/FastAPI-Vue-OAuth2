@@ -1,12 +1,13 @@
 from datetime import datetime
 
-from sqlalchemy import select, update, delete
+from sqlalchemy import select, update, delete, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends, status, HTTPException
 from jose import JWTError, jwt
 from schemas.token import TokenData
+from models.db import user_role
 
 from auth.utils import get_password_hash
 from models.db import UserModels
@@ -41,8 +42,8 @@ class UserCRUD:
     )
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-            print(payload)
-            username: str = payload.get("sub")
+    
+            username: str = payload["username"]
             if username is None:
                 raise credentials_exception
             token_data = TokenData(username=username)
@@ -51,8 +52,7 @@ class UserCRUD:
         user: user_schema.DB = await self.get_user_by_username(username=token_data.username)
         if user is None:
             raise credentials_exception
-        print({"username": user.username})
-        return {"username": user.username}
+        return user
     
     async def get_user_by_username(self, username: str) -> user_schema.DB:
         stmt = select(UserModels).where(UserModels.username == username)
@@ -66,33 +66,33 @@ class UserCRUD:
         users = result.scalars().all()
         return users
 
-    async def create_user(self, user: user_schema.Create) -> user_schema.DB:
-        #if not await self.check_username(user.username):
-        #    return None
-        db_user = UserModels(
-            username=user.username,
-            name=user.name,
+    async def create_user(self, user: user_schema.DB) -> user_schema.DB:
+        #check = await self.check_username(user.username)
+        #if not check:
+            #raise HTTPException(
+                #status_code=400,
+                #detail="Invalid domain"
+            #)
+        stmt = (
+            insert(UserModels)
+            .values(username=user.username, name=user.name)
         )
-        self.db_session.add(db_user)
+        stmt2 = None
+        if user.username == "superuser":
+            stmt2 = insert(user_role).values(username=user.username, role_name="superuser")
+        else:   
+            stmt2 = insert(user_role).values(username=user.username, role_name="teacher")
+        stmt.execution_options(synchronize_session="fetch")
+        stmt2.execution_options(synchronize_session="fetch")
+        await self.db_session.execute(stmt)
+        await self.db_session.execute(stmt2)
         await self.db_session.commit()
-        return db_user
-    
-    async def super_user_login(self, username: str, api_key: str):
-        if api_key != "super_secret_key":
-            return None
-        db_user = await self.get_user_by_username(username)
-        if db_user is not None:
-            return None
-        db_user = UserModels(
-            username=username,
-            request_permission=True,
-        )
+        return user
 
     async def update_user_login(self, username: str):
         db_user = await self.get_user_by_username(username)
         db_user.last_login = datetime.now()
-        await self.db_session.refresh(db_user)
-        return db_user
+        await self.db_session.commit()
 
     async def update_birthday(self, username: str, birthday: datetime):
         stmt = (
