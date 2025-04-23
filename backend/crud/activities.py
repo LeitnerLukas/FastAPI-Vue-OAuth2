@@ -19,7 +19,6 @@ class ActivityCRUD:
             joinedload(Activities.users),
             joinedload(Activities.classes),
             joinedload(Activities.parent_infos),
-            # joinedload(Activities.notes),
         )
         result = await self.db_session.execute(stmt)
         activities = result.unique().scalars().all()
@@ -30,7 +29,6 @@ class ActivityCRUD:
             joinedload(Activities.users),
             joinedload(Activities.classes),
             joinedload(Activities.parent_infos),
-            # joinedload(Activities.notes),
         ).filter_by(activity_id=activity_id)
         result = await self.db_session.execute(stmt)
         activities = result.scalars().first()
