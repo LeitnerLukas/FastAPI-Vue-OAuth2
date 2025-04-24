@@ -1,29 +1,88 @@
 <template>
-    <div class="row d-flex justify-content-center mx-auto mt-5">
-        <div class="col-6 pt-6">
-            <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">User</th>
-                    <th scope="col">Birthday</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(user, idx) in userList.value" :key="idx">
-                    <th scope="row">{{ idx + 1 }}</th>
-                    <td>@{{ user.username }}</td>
-                    <td>{{ user.birthday }}</td>
-                </tr>
-            </tbody>
-        </table>
+  <div class="container mt-5">
+     <!-- Hero Section -->
+     <section class="hero">
+      <div class="container">
+        <h1 class="display-4">Streamline Your Approval Workflow</h1>
+        <p class="lead">Approval Sense helps teams collaborate and approve projects effortlessly.</p>
+        <button class="btn btn-primary btn-lg mt-3"><router-link class="text-white" to="/login">Get Started</router-link></button>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5">
+      <div class="container text-center">
+        <h2 class="mb-4">Features</h2>
+        <div class="row g-4">
+          <div class="col-md-4">
+            <div class="card feature-card p-3">
+              <div class="card-body">
+                <h5 class="card-title">Seamless Integration</h5>
+                <p class="card-text">Connect with your favorite tools and platforms effortlessly.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card feature-card p-3">
+              <div class="card-body">
+                <h5 class="card-title">User Management</h5>
+                <p class="card-text">Manage your students with our professional User Dashboard.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card feature-card p-3">
+              <div class="card-body">
+                <h5 class="card-title">Advanced Approval Management</h5>
+                <p class="card-text">Manage your approval Flow easier than ever.</p>
+              </div>
+            </div>
+          </div>
         </div>
-    </div>
+      </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-5 bg-light">
+      <div class="container text-center">
+        <h2 class="mb-4">What Our Users Say</h2>
+        <div class="row g-4">
+          <div class="col-md-4">
+            <blockquote class="blockquote">
+              <p>"Approval Sense has transformed our approval process. It's so simple!"</p>
+              <footer class="blockquote-footer">Jane Doe, Project Manager</footer>
+            </blockquote>
+          </div>
+          <div class="col-md-4">
+            <blockquote class="blockquote">
+              <p>"I can't imagine working without Approval Sense. It's a game-changer."</p>
+              <footer class="blockquote-footer">John Smith, Team Lead</footer>
+            </blockquote>
+          </div>
+          <div class="col-md-4">
+            <blockquote class="blockquote">
+              <p>"The analytics feature is fantastic. We now make better decisions faster."</p>
+              <footer class="blockquote-footer">Emily Johnson, Analyst</footer>
+            </blockquote>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section id="contact" class="py-5">
+      <div class="container text-center">
+        <h2 class="mb-4">Ready to Simplify Approvals?</h2>
+        <button class="btn btn-primary btn-lg"><router-link to="/login" class="text-white">Sign Up Now</router-link></button>
+      </div>
+    </section>
+    
+  </div>
+  <footer class="bg-dark text-white py-3">
+      <div class="container text-center">
+        <p class="mb-0">&copy; 2025 Approval Sense. All rights reserved.</p>
+      </div>
+    </footer>
 </template>
-  
-<script setup>
 
-import { useFetchUser } from '../store/user';
-const { userList } = useFetchUser();
-
-</script>
+<script setup></script>
