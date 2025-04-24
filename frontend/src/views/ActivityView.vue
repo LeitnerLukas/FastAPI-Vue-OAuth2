@@ -124,7 +124,18 @@ const saveNote = async () => {
     alert('Note cannot be empty.');
     return;
   }
-  await createNote(note.value);
+  try {
+    const token = authStore.token;
+    console.log('Token:', token);
+    const newActivity = {
+      ...activity.value,
+      note: note.value,
+    };
+    await createNote(newActivity, token);
+    console.log('Activity created successfully');
+  } catch (error) {
+    console.error('Error adding activity:', error.response?.data || error);
+  }
   console.log('Saving note:', note.value, activityId.value);
   // Add backend API call here
 };

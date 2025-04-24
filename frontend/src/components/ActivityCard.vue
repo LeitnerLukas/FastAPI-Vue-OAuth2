@@ -11,7 +11,12 @@
           </h6>
         </div>
         <span
-          :class="['badge', entity.sga_approved ? 'bg-success' : 'bg-danger']"
+          :class="[
+            'badge',
+            entity.sga_approved
+              ? 'bg-success text-white'
+              : 'bg-danger text-white',
+          ]"
         >
           {{ entity.sga_approved ? 'SGA Approved' : 'Not Approved' }}
         </span>
