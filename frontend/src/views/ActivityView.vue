@@ -37,7 +37,9 @@
             </p>
             <p>
               <strong>State:</strong>
-              <span class="badge bg-primary">{{ activity.state }}</span>
+              <span class="badge bg-primary text-white">{{
+                activity.state
+              }}</span>
             </p>
           </div>
         </div>
@@ -86,6 +88,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuthStore } from '../store/auth';
+import { apiGetActivity } from '../api/activities';
 
 const route = useRoute();
 const authStore = useAuthStore();
@@ -106,40 +109,13 @@ const formatDate = (date) => {
   });
 };
 
-const fetchActivity = () => {
-  const activities = [
-    {
-      activityId: 1,
-      curriculum_reference: 'CURR001',
-      location: 'New York',
-      description: 'Activity Description 1',
-      cost: 100.0,
-      transfer_cost: 20.5,
-      sga_approved: true,
-      starting_date: '2025-02-01T00:00:00Z',
-      ending_date: '2025-02-10T00:00:00Z',
-      state: 'Active',
-    },
-    {
-      activityId: 2,
-      curriculum_reference: 'CURR002',
-      location: 'Los Angeles',
-      description: 'Activity Description 2',
-      cost: 150.0,
-      transfer_cost: 30.0,
-      sga_approved: false,
-      starting_date: '2025-03-05T00:00:00Z',
-      ending_date: '2025-03-15T00:00:00Z',
-      state: 'Pending',
-    },
-  ];
-  const foundActivity = activities.find(
-    (a) => a.activityId === parseInt(activityId.value)
-  );
-  if (foundActivity) {
-    activity.value = foundActivity;
-  } else {
-    console.error('Activity not found for ID:', activityId.value);
+const fetchActivity = async () => {
+  try {
+    const token = authStore.token; // Assuming the token is stored in the auth store
+    const response = await apiGetActivity(activityId.value, token);
+    activity.value = response.data;
+  } catch (error) {
+    console.error('Error fetching activity:', error);
   }
 };
 
