@@ -37,9 +37,7 @@
             </p>
             <p>
               <strong>State:</strong>
-              <span class="badge bg-primary text-white">{{
-                activity.state
-              }}</span>
+              <span class="badge bg-primary">{{ activity.state }}</span>
             </p>
           </div>
         </div>
@@ -88,16 +86,14 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuthStore } from '../store/auth';
-import { apiGetActivities } from '../api/activities';
+import { apiGetActivity, updateActivity } from '../api/activities';
 
 const route = useRoute();
 const authStore = useAuthStore();
 
 const activity = ref(null);
 const note = ref('');
-
 const isTeacher = computed(() => authStore.userRole === 'teacher');
-
 const activityId = computed(() => route.params.id);
 
 const formatDate = (date) => {
@@ -109,40 +105,44 @@ const formatDate = (date) => {
   });
 };
 
+// Fetch single activity by ID
 const fetchActivity = async () => {
   try {
-    const token = authStore.token; // Assuming the token is stored in the auth store
-    const response = await apiGetActivities(activityId.value, token);
+    const token = authStore.token; // Assuming token is stored here
+    const response = await apiGetActivity(activityId.value, token);
     activity.value = response.data;
+    note.value = activity.value.note || ''; // Load existing note if any
   } catch (error) {
     console.error('Error fetching activity:', error);
   }
 };
 
+// Save note and update activity
 const saveNote = async () => {
   if (!note.value.trim()) {
     alert('Note cannot be empty.');
     return;
   }
+
   try {
-    const token = authStore.token;
-    console.log('Token:', token);
-    const newActivity = {
-      ...activity.value,
-      note: note.value,
-    };
-    await createNote(newActivity, token);
-    console.log('Activity created successfully');
+    const updated = { ...activity.value, note: note.value };
+    await updateActivity(updated);
+    console.log('Note saved successfully.');
   } catch (error) {
-    console.error('Error adding activity:', error.response?.data || error);
+    console.error('Error saving note:', error);
   }
-  console.log('Saving note:', note.value, activityId.value);
-  // Add backend API call here
 };
 
-const approve = () => {
-  console.log('Approving activity:', activityId.value);
-  // Add backend API call here
+// Approve the activity
+const approve = async () => {
+  try {
+    const updated = { ...activity.value, approved: true };
+    await updateActivity(updated);
+    activity.value.approved = true;
+    console.log('Activity approved successfully.');
+  } catch (error) {
+    console.error('Error approving activity:', error);
+  }
 };
 
 onMounted(() => {
