@@ -88,7 +88,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuthStore } from '../store/auth';
-import { apiGetActivity } from '../api/activities';
+import { apiGetActivities } from '../api/activities';
 
 const route = useRoute();
 const authStore = useAuthStore();
@@ -102,7 +102,7 @@ const activityId = computed(() => route.params.id);
 
 const formatDate = (date) => {
   const d = new Date(date);
-  return d.toLocaleDateString('de-DE', {
+  return d.toLocaleDateString('de-AT', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
