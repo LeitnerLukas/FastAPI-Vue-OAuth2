@@ -69,9 +69,16 @@
             v-if="activity"
             @click="approve"
             class="btn btn-primary"
-            :disabled="isTeacher || activity.approved"
+            :disabled="isTeacher || activity.approved || isDirector"
           >
             Approve
+          </button>
+          <button
+          v-if="activity"
+            @click="superApprove"
+            class="btn btn-primary"
+            :disabled="isTeacher || activity.approved || isDepartment">
+            Super-Approve
           </button>
         </div>
       </div>
@@ -86,15 +93,19 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuthStore } from '../store/auth';
-import { apiGetActivity, updateActivity } from '../api/activities';
+import { apiGetActivity, updateActivity, approveActivity, superapproveActivity } from '../api/activities';
 
 const route = useRoute();
-const authStore = useAuthStore();
+const auth = useAuthStore();
 
 const activity = ref(null);
 const note = ref('');
-const isTeacher = computed(() => authStore.userRole === 'teacher');
+const isTeacher = computed(() => auth.userRole === 'teacher');
+const isDepartment = computed(() => auth.userRole === 'department_head');
+const isDirector = computed(() => auth.userRole === 'director');
 const activityId = computed(() => route.params.id);
+
+console.log(isDepartment.value, isDirector.value, isTeacher.value);
 
 const formatDate = (date) => {
   const d = new Date(date);
@@ -108,8 +119,8 @@ const formatDate = (date) => {
 // Fetch single activity by ID
 const fetchActivity = async () => {
   try {
-    const token = authStore.token; // Assuming token is stored here
-    const response = await apiGetActivity(activityId.value, token);
+    const response = await apiGetActivity(activityId.value, auth.access_token);
+    console.log(activityId.value, auth.access_token);
     activity.value = response.data;
     note.value = activity.value.note || ''; // Load existing note if any
   } catch (error) {
@@ -136,12 +147,21 @@ const saveNote = async () => {
 // Approve the activity
 const approve = async () => {
   try {
-    const updated = { ...activity.value, approved: true };
-    await updateActivity(updated);
+    await approveActivity(activityId.value, auth.access_token);
     activity.value.approved = true;
     console.log('Activity approved successfully.');
   } catch (error) {
     console.error('Error approving activity:', error);
+  }
+};
+
+const superApprove = async () => {
+  try {
+    await superapproveActivity(activityId.value, auth.access_token);
+    activity.value.approved = true;
+    console.log('Activity super-approved successfully.');
+  } catch (error) {
+    console.error('Error super-approving activity:', error);
   }
 };
 

@@ -22,6 +22,8 @@
 <script>
 import EntityDisplay from '../components/ActivityCard.vue';
 import { apiGetActivities } from '../api/activities.js';
+import { useAuthStore } from '../store/auth';
+
 
 export default {
   components: {
@@ -38,7 +40,8 @@ export default {
   methods: {
     async fetchActivities() {
       try {
-        const response = await apiGetActivities();
+        const auth = useAuthStore();
+        const response = await apiGetActivities(auth.access_token);
         this.entities = response.data; // Assuming the API returns an array of activities
       } catch (error) {
         console.error('Error fetching activities:', error);

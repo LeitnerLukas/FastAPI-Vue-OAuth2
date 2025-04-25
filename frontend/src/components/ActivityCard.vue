@@ -4,7 +4,7 @@
       <div class="d-flex justify-content-between align-items-start mb-3">
         <div>
           <h5 class="card-title">
-            {{ entity.activityId }} - {{ entity.curriculum_reference }}
+            {{ entity.activity_id }} - {{ entity.curriculum_reference }}
           </h5>
           <h6 class="card-subtitle mb-2 text-muted">
             State: {{ entity.state }}
@@ -18,7 +18,7 @@
               : 'bg-danger text-white',
           ]"
         >
-          {{ entity.sga_approved ? 'SGA Approved' : 'Not Approved' }}
+          {{ entity.sga_approved ? 'SGA Approved' : 'Not SGA Approved' }}
         </span>
       </div>
 
@@ -49,7 +49,7 @@
       </p>
 
       <router-link
-        :to="'/activity/' + entity.activityId"
+        :to="'/activity/' + entity.activity_id"
         class="btn btn-primary"
       >
         View Details

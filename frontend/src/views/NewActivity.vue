@@ -15,9 +15,9 @@ const activity = ref({
   cost: 0,
   transfer_cost: 0,
   sga_approved: false,
-  starting_date: '',
-  ending_date: '',
-  class_id: null,
+  start_time: '',
+  end_time: '',
+  class_ids: [],
 });
 
 const classes = ref([]);
@@ -54,11 +54,11 @@ const addActivity = async () => {
       cost: 0,
       transfer_cost: 0,
       sga_approved: false,
-      starting_date: '',
-      ending_date: '',
-      class_id: null,
+      start_time: '',
+      end_time: '',
+      class_ids: [],
     });
-    router.push({ name: 'Activities' });
+    router.push({ name: 'Dashboard' });
   } catch (error) {
     console.error('Error adding activity:', error);
   }
@@ -75,23 +75,33 @@ onMounted(fetchClasses);
           <div class="card-body">
             <h2 class="card-title mb-4">Add New Activity</h2>
             <form @submit.prevent="addActivity">
-              <div class="mb-3">
+                <div class="mb-3">
                 <label for="class_id" class="form-label">Class</label>
                 <select
-                  v-model="activity.class_id"
                   id="class_id"
                   class="form-select"
-                  required
+                  @change="(event) => {
+                  const selectedClassId = event.target.value;
+                  if (!activity.class_ids.includes(selectedClassId)) {
+                    activity.class_ids.push(selectedClassId);
+                  }
+                  }"
                 >
+                  <option value="" disabled selected>Select a class</option>
                   <option
-                    v-for="classItem in classes"
-                    :key="classItem.class_id"
-                    :value="classItem.class_id"
+                  v-for="classItem in classes"
+                  :key="classItem.class_id"
+                  :value="classItem.class_id"
                   >
-                    {{ classItem.class_id }}
+                  {{ classItem.class_id }}
                   </option>
                 </select>
-              </div>
+                <div class="mt-2">
+                  <span v-for="classId in activity.class_ids" :key="classId" class="badge bg-primary me-1">
+                  {{ classId }}
+                  </span>
+                </div>
+                </div>
 
               <div class="mb-3">
                 <label for="location" class="form-label">Location</label>
@@ -170,7 +180,7 @@ onMounted(fetchClasses);
                   >Starting Date</label
                 >
                 <input
-                  v-model="activity.starting_date"
+                  v-model="activity.start_time"
                   type="datetime-local"
                   class="form-control"
                   id="starting_date"
@@ -181,7 +191,7 @@ onMounted(fetchClasses);
               <div class="mb-3">
                 <label for="ending_date" class="form-label">Ending Date</label>
                 <input
-                  v-model="activity.ending_date"
+                  v-model="activity.end_time"
                   type="datetime-local"
                   class="form-control"
                   id="ending_date"
