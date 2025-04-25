@@ -112,7 +112,7 @@ const formatDate = (date) => {
 const fetchActivity = async () => {
   try {
     const token = authStore.token; // Assuming the token is stored in the auth store
-    const response = await apiGetActivity(activityId.value, token);
+    const response = await apiGetActivities(activityId.value, token);
     activity.value = response.data;
   } catch (error) {
     console.error('Error fetching activity:', error);
